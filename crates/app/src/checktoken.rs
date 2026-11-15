@@ -1466,6 +1466,96 @@ fn transport_note(api_base: &str) -> Result<Option<&'static str>, &'static str> 
     Ok(prcore::origin::is_private_http_url(api_base).then_some(prcore::origin::CLEARTEXT_WARNING))
 }
 
+/// The accounts a bare `--check-token` tests: every enabled account the cache holds. A named
+/// `--account`, or `--repo` / `--pr` / `--write-test` (which belong to one forge), test a
+/// single account instead; so does a cache with no accounts (the default sign-in).
+pub fn accounts_to_check(accounts: &[Account], args: &CheckArgs) -> Option<Vec<Account>> {
+    let bare =
+        args.account.is_none() && args.repo.is_none() && args.pr.is_none() && !args.write_test;
+    let enabled: Vec<Account> = accounts.iter().filter(|a| a.enabled).cloned().collect();
+    (bare && !enabled.is_empty()).then_some(enabled)
+}
+
+/// One account's check: its report, the secrets to scrub from it and the cleartext warning
+/// to show first, when its address is plain private http.
+struct Checked {
+    report: Report,
+    secrets: Vec<String>,
+    warning: Option<&'static str>,
+}
+
+/// `Err` when nothing was sent because the account's API address is not allowed.
+fn check_account(
+    rt: &tokio::runtime::Runtime,
+    secrets: &store::CredentialManagerSecrets,
+    accounts: &[Account],
+    account: &Account,
+    args: &CheckArgs,
+    env: impl Fn(&str) -> Option<String> + Copy,
+) -> Result<Checked, String> {
+    let warning = transport_note(&account.api_base).map_err(str::to_string)?;
+    let github_token =
+        (account.forge == Forge::GitHub).then(|| github::load_token(secrets, account, env));
+    let gitlab_token =
+        (account.forge == Forge::GitLab).then(|| gitlab::load_token(secrets, account, env));
+    let creds = load_account_credentials(secrets, account, env);
+    let mut secret_values = tokens_to_scrub(secrets, accounts, &creds, env);
+    for (t, _) in [&github_token, &gitlab_token]
+        .into_iter()
+        .flatten()
+        .flatten()
+    {
+        secret_values.push(t.clone());
+    }
+    let mut report = match (github_token, gitlab_token) {
+        (_, Some(token)) => {
+            let bases = gitlab::bases_of(account);
+            let inputs = gitlab::Inputs {
+                args,
+                bases: &bases,
+                git: &SystemGit,
+                proxy_var: proxy_var(),
+                today: chrono::Local::now().date_naive(),
+            };
+            rt.block_on(gitlab::run(&inputs, token))
+        }
+        (Some(token), None) => {
+            let bases = github::bases_of(account);
+            let inputs = github::Inputs {
+                args,
+                bases: &bases,
+                git: &SystemGit,
+                proxy_var: proxy_var(),
+            };
+            rt.block_on(github::run(&inputs, token))
+        }
+        (None, None) => {
+            let inputs = Inputs {
+                args,
+                api_base: &account.api_base,
+                git: &SystemGit,
+                proxy_var: proxy_var(),
+            };
+            rt.block_on(run(&inputs, creds))
+        }
+    };
+    report.account = Some(account_label(account));
+    Ok(Checked {
+        report,
+        secrets: secret_values,
+        warning,
+    })
+}
+
+fn account_label(account: &Account) -> String {
+    format!(
+        "{} {} ({})",
+        account.forge.label(),
+        account.git_host,
+        account.id.as_str()
+    )
+}
+
 /// Runs the check and returns the process exit code (0: no problem, 1: at least one).
 pub fn main(args: CheckArgs) -> i32 {
     let mut out = console::attach();
@@ -1482,106 +1572,98 @@ pub fn main(args: CheckArgs) -> i32 {
         .and_then(|p| store::Store::open(&p).ok())
         .and_then(|s| s.accounts().ok())
         .unwrap_or_default();
-    let account = match select_account(&accounts, args.account.as_deref()) {
-        Ok(a) => a,
-        // a first run without a stored GitHub or GitLab account: NIT_GITHUB_TOKEN /
-        // NIT_GITHUB_URL, NIT_GITLAB_TOKEN / NIT_GITLAB_URL
-        Err(e) => match github::env_account(args.account.as_deref(), env)
-            .or_else(|| gitlab::env_account(args.account.as_deref(), env))
-        {
-            Some(a) => a,
-            None => {
-                out.write(&format!("--account: {e}\n"));
-                return 2;
-            }
-        },
-    };
-    let args = match args
-        .repo
-        .as_ref()
-        .map(|r| repo_for(&account, r))
-        .transpose()
-    {
-        Ok(repo) => CheckArgs { repo, ..args },
-        Err(e) => {
-            out.write(&format!("{e}\n"));
-            return 2;
-        }
-    };
-    match transport_note(&account.api_base) {
-        Ok(None) => {}
-        Ok(Some(warning)) => out.write(&format!("warning: {warning}\n")),
-        Err(e) => {
-            out.write(&format!("{e}\n"));
-            return 2;
-        }
-    }
-    let github_token =
-        (account.forge == Forge::GitHub).then(|| github::load_token(&secrets, &account, env));
-    let gitlab_token =
-        (account.forge == Forge::GitLab).then(|| gitlab::load_token(&secrets, &account, env));
-    let creds = load_account_credentials(&secrets, &account, env);
-    let mut secret_values = tokens_to_scrub(&secrets, &accounts, &creds, env);
-    for (t, _) in [&github_token, &gitlab_token]
-        .into_iter()
-        .flatten()
-        .flatten()
-    {
-        secret_values.push(t.clone());
-    }
-    let report = match tokio::runtime::Builder::new_multi_thread()
+    let rt = match tokio::runtime::Builder::new_multi_thread()
         .worker_threads(2)
         .enable_all()
         .build()
     {
-        Ok(rt) => {
-            let mut report = match (github_token, gitlab_token) {
-                (_, Some(token)) => {
-                    let bases = gitlab::bases_of(&account);
-                    let inputs = gitlab::Inputs {
-                        args: &args,
-                        bases: &bases,
-                        git: &SystemGit,
-                        proxy_var: proxy_var(),
-                        today: chrono::Local::now().date_naive(),
-                    };
-                    rt.block_on(gitlab::run(&inputs, token))
-                }
-                (Some(token), None) => {
-                    let bases = github::bases_of(&account);
-                    let inputs = github::Inputs {
-                        args: &args,
-                        bases: &bases,
-                        git: &SystemGit,
-                        proxy_var: proxy_var(),
-                    };
-                    rt.block_on(github::run(&inputs, token))
-                }
-                (None, None) => {
-                    let inputs = Inputs {
-                        args: &args,
-                        api_base: &account.api_base,
-                        git: &SystemGit,
-                        proxy_var: proxy_var(),
-                    };
-                    rt.block_on(run(&inputs, creds))
-                }
-            };
-            report.account = Some(format!(
-                "{} {} ({})",
-                account.forge.label(),
-                account.git_host,
-                account.id.as_str()
-            ));
-            report
-        }
+        Ok(rt) => rt,
         Err(_) => {
             out.write("could not start the async runtime\n");
             return 1;
         }
     };
-    let secrets: Vec<&str> = secret_values.iter().map(String::as_str).collect();
-    let text = report.render(&secrets);
+    let rule = "=".repeat(60);
+    let (text, problems) = match accounts_to_check(&accounts, &args) {
+        Some(list) => {
+            let mut texts = Vec::new();
+            let mut failed = 0usize;
+            for account in &list {
+                match check_account(&rt, &secrets, &accounts, account, &args, env) {
+                    Ok(c) => {
+                        let scrub: Vec<&str> = c.secrets.iter().map(String::as_str).collect();
+                        let mut t = String::new();
+                        if let Some(w) = c.warning {
+                            t.push_str(&format!("warning: {w}\n"));
+                        }
+                        t.push_str(&c.report.render(&scrub));
+                        failed += usize::from(c.report.problems() > 0);
+                        texts.push(t);
+                    }
+                    Err(e) => {
+                        failed += 1;
+                        texts.push(format!(
+                            "nit token check\nAccount: {}\n\n{e}\n",
+                            account_label(account)
+                        ));
+                    }
+                }
+            }
+            let mut text = texts.join(&format!("\n{rule}\n\n"));
+            let skipped = accounts.len() - list.len();
+            let skipped_note = if skipped > 0 {
+                format!(", skipped (disabled): {skipped}")
+            } else {
+                String::new()
+            };
+            text.push_str(&format!(
+                "\n{rule}\nAccounts checked: {}, with problems: {failed}{skipped_note}\n",
+                list.len()
+            ));
+            (text, failed)
+        }
+        None => {
+            let account = match select_account(&accounts, args.account.as_deref()) {
+                Ok(a) => a,
+                // a first run without a stored GitHub or GitLab account: NIT_GITHUB_TOKEN /
+                // NIT_GITHUB_URL, NIT_GITLAB_TOKEN / NIT_GITLAB_URL
+                Err(e) => match github::env_account(args.account.as_deref(), env)
+                    .or_else(|| gitlab::env_account(args.account.as_deref(), env))
+                {
+                    Some(a) => a,
+                    None => {
+                        out.write(&format!("--account: {e}\n"));
+                        return 2;
+                    }
+                },
+            };
+            let args = match args
+                .repo
+                .as_ref()
+                .map(|r| repo_for(&account, r))
+                .transpose()
+            {
+                Ok(repo) => CheckArgs { repo, ..args },
+                Err(e) => {
+                    out.write(&format!("{e}\n"));
+                    return 2;
+                }
+            };
+            match check_account(&rt, &secrets, &accounts, &account, &args, env) {
+                Ok(c) => {
+                    if let Some(w) = c.warning {
+                        out.write(&format!("warning: {w}\n"));
+                    }
+                    let scrub: Vec<&str> = c.secrets.iter().map(String::as_str).collect();
+                    (c.report.render(&scrub), c.report.problems())
+                }
+                Err(e) => {
+                    out.write(&format!("{e}\n"));
+                    return 2;
+                }
+            }
+        }
+    };
     let path = report_path();
     let saved = path
         .parent()
@@ -1598,7 +1680,7 @@ pub fn main(args: CheckArgs) -> i32 {
     if !out.visible() && saved.is_ok() {
         let _ = std::process::Command::new("notepad.exe").arg(&path).spawn();
     }
-    i32::from(report.problems() > 0)
+    i32::from(problems > 0)
 }
 
 /// Where the report is printed: the inherited stdout, the parent's console, or nowhere.
@@ -1930,6 +2012,54 @@ mod tests {
         ] {
             assert!(transport_note(bad).is_err(), "{bad}");
         }
+    }
+
+    #[test]
+    fn bare_check_tests_every_enabled_account() {
+        let mut off = account("acc-off", Forge::GitHub, "github.com");
+        off.enabled = false;
+        let accounts = vec![
+            Account::default_bitbucket("{ana}".into(), "Ana".into()),
+            account("acc-gl", Forge::GitLab, "git.corp.example/gitlab"),
+            off,
+        ];
+        let bare = CheckArgs {
+            account: None,
+            repo: None,
+            pr: None,
+            write_test: false,
+        };
+        let ids = |v: Option<Vec<Account>>| {
+            v.map(|l| {
+                l.iter()
+                    .map(|a| a.id.as_str().to_string())
+                    .collect::<Vec<_>>()
+            })
+        };
+        // every enabled account, in cache order; the disabled one is left out
+        assert_eq!(
+            ids(accounts_to_check(&accounts, &bare)),
+            Some(vec!["acc-bitbucket-default".into(), "acc-gl".into()])
+        );
+        // a named account, or options that belong to one forge, mean a single check
+        for single in [
+            CheckArgs {
+                account: Some("acc-gl".into()),
+                ..bare.clone()
+            },
+            CheckArgs {
+                repo: RepoRef::parse_bitbucket("acme/api"),
+                ..bare.clone()
+            },
+            CheckArgs {
+                pr: Some(7),
+                ..bare.clone()
+            },
+        ] {
+            assert_eq!(accounts_to_check(&accounts, &single), None, "{single:?}");
+        }
+        // no cache (or nothing enabled): the single default sign-in as before
+        assert_eq!(accounts_to_check(&[], &bare), None);
     }
 
     #[test]

@@ -8,6 +8,8 @@ While the version is below 1.0, minor versions may contain breaking changes.
 
 ## [Unreleased]
 
+- `nit --check-token` without `--account` now tests every enabled account (Bitbucket, GitHub, GitLab) and ends with a one-line summary; it used to test only the signed-in Bitbucket account.
+
 ## [0.1.0] - 2026-11-15
 
 First public version. Windows, Linux and macOS. Bitbucket Cloud, GitHub and GitLab.
