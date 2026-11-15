@@ -10,7 +10,7 @@ cargo run -p app --release -- --demo # built-in data, no network, no credentials
 cargo test --workspace
 ```
 
-Windows is the main platform. macOS (Apple silicon and Intel) and Linux (x86_64, aarch64) build from the same sources and run the same tests in CI. On Linux (Debian / Ubuntu names):
+Windows is the main platform. macOS (Apple silicon and Intel) and Linux (x86_64) build from the same sources and run the same tests in CI. On Linux (Debian / Ubuntu names):
 
 - To build: `sudo apt install build-essential pkg-config libdbus-1-dev` (a C compiler for the bundled SQLite and Oniguruma; libdbus for the Secret Service). Nothing else: X11, Wayland, xkbcommon, Vulkan / OpenGL and the portal's libdbus are loaded at run time.
 - To run: a desktop session (X11 or Wayland) with `libxkbcommon0` (plus `libxkbcommon-x11-0`, `libx11-xcb1`, `libxcursor1`, `libxrandr2`, `libxi6` on X11, `libwayland-client0` on Wayland), a Vulkan or OpenGL driver (`mesa-vulkan-drivers` or `libgl1-mesa-dri` + `libegl1`), `libdbus-1-3`, `git` 2.31 or newer, `xdg-utils` (Open folder / Open in browser), `xdg-desktop-portal` with a backend for the folder dialog (or `zenity`), and a Secret Service (GNOME Keyring, KWallet or KeePassXC) to store tokens. Without a Secret Service sign-in fails with "credential store unavailable"; tokens are never written to a file instead.

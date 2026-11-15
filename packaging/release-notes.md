@@ -6,10 +6,10 @@
 | | `nit-@VERSION@-windows-x86_64.exe`, `.zip` | Portable: run the exe from anywhere |
 | macOS 11 or later, Apple silicon | `nit-@VERSION@-macos-arm64.dmg` | Drag nit to Applications (`.tar.gz`: the same app) |
 | macOS 11 or later, Intel | `nit-@VERSION@-macos-x86_64.dmg` | As above |
-| Linux, x86_64 / aarch64 | `nit-@VERSION@-linux-<arch>.deb` | Debian 12+, Ubuntu 22.04+: `sudo apt install ./nit-…deb` |
-| | `nit-@VERSION@-linux-<arch>.rpm` | Fedora, openSUSE: `sudo dnf install ./nit-…rpm` |
-| | `nit-@VERSION@-linux-<arch>.AppImage` | `chmod +x` and run; needs FUSE 2 or 3 |
-| | `nit-@VERSION@-linux-<arch>.tar.gz` | The binary with its desktop file and icon |
+| Linux, x86_64 | `nit-@VERSION@-linux-x86_64.deb` | Debian 12+, Ubuntu 22.04+: `sudo apt install ./nit-…deb` |
+| | `nit-@VERSION@-linux-x86_64.rpm` | Fedora, openSUSE: `sudo dnf install ./nit-…rpm` |
+| | `nit-@VERSION@-linux-x86_64.AppImage` | `chmod +x` and run; needs FUSE 2 or 3 |
+| | `nit-@VERSION@-linux-x86_64.tar.gz` | The binary with its desktop file and icon |
 
 All builds need git 2.31 or newer. On Linux tokens are stored through the Secret Service (GNOME Keyring, KWallet or KeePassXC), and the builds need glibc 2.35 or newer. `SHA256SUMS` lists the checksums (`sha256sum -c SHA256SUMS --ignore-missing`).
 
