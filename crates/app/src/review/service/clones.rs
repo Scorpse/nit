@@ -134,5 +134,7 @@ pub(super) const CANCELLED: &str = "cancelled";
 pub(super) fn repo_load_lock(key: &str) -> Arc<Mutex<()>> {
     static LOCKS: OnceLock<Mutex<HashMap<String, Arc<Mutex<()>>>>> = OnceLock::new();
     let mut map = lock_ok(LOCKS.get_or_init(Default::default));
+    // Drop locks nobody holds, so the map follows the repositories in use.
+    map.retain(|_, l| Arc::strong_count(l) > 1);
     map.entry(key.to_string()).or_default().clone()
 }
