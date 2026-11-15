@@ -33,7 +33,7 @@ jobs:
             os: ubuntu-latest
             fmt: true
           - name: macOS (clippy, test)
-            os: macos-latest # arm64
+            os: macos-15-intel
             fmt: false
     steps:
       - uses: actions/checkout@v7
