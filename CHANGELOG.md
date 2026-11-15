@@ -8,7 +8,7 @@ While the version is below 1.0, minor versions may contain breaking changes.
 
 ## [Unreleased]
 
-## [0.1.0] - TBD
+## [0.1.0] - 2026-11-15
 
 First public version. Windows, Linux and macOS. Bitbucket Cloud, GitHub and GitLab.
 
