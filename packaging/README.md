@@ -32,7 +32,7 @@ All packages start from `cargo build --release --locked -p app`.
   `packaging/linux/package.sh x.y.z dist`. The release builds in an Ubuntu 22.04 container,
   so the packages need glibc 2.35 or newer.
 - macOS: `MACOSX_DEPLOYMENT_TARGET=11.0` for the build, then
-  `packaging/macos/bundle.sh app x.y.z dist` and `packaging/macos/bundle.sh dmg x.y.z arm64 dist`.
+  `packaging/macos/bundle.sh app x.y.z dist` and `packaging/macos/bundle.sh dmg x.y.z x86_64 dist`.
 
 ## What the packages contain
 

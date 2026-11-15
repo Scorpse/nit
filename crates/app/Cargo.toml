@@ -120,3 +120,6 @@ xdg-utils = "*"
 
 [package.metadata.generate-rpm.recommends]
 xdg-desktop-portal = "*"
+
+[lints]
+workspace = true

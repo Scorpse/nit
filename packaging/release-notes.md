@@ -4,8 +4,7 @@
 | --- | --- | --- |
 | Windows 10 / 11, x86_64 | `nit-@VERSION@-windows-x86_64-setup.exe` | Installer: per user, no admin rights, uninstall from Settings, Apps |
 | | `nit-@VERSION@-windows-x86_64.exe`, `.zip` | Portable: run the exe from anywhere |
-| macOS 11 or later, Apple silicon | `nit-@VERSION@-macos-arm64.dmg` | Drag nit to Applications (`.tar.gz`: the same app) |
-| macOS 11 or later, Intel | `nit-@VERSION@-macos-x86_64.dmg` | As above |
+| macOS 11 or later, Intel (Apple silicon runs it under Rosetta 2) | `nit-@VERSION@-macos-x86_64.dmg` | As above |
 | Linux, x86_64 | `nit-@VERSION@-linux-x86_64.deb` | Debian 12+, Ubuntu 22.04+: `sudo apt install ./nit-…deb` |
 | | `nit-@VERSION@-linux-x86_64.rpm` | Fedora, openSUSE: `sudo dnf install ./nit-…rpm` |
 | | `nit-@VERSION@-linux-x86_64.AppImage` | `chmod +x` and run; needs FUSE 2 or 3 |

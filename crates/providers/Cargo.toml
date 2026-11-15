@@ -19,3 +19,6 @@ chrono = { version = "0.4", features = ["serde"] }
 wiremock = "0.6"
 serde_json = "1"
 tokio = { version = "1", features = ["net", "io-util"] }
+
+[lints]
+workspace = true

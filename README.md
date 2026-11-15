@@ -32,7 +32,7 @@ Download a file from the [latest release](https://github.com/Scorpse/nit/release
 | --- | --- | --- |
 | Windows 10 / 11, x86_64 | `nit-<version>-windows-x86_64-setup.exe` | Run the installer (no admin rights) and start nit from the Start Menu. Uninstall in Settings, Apps. |
 | | `nit-<version>-windows-x86_64.exe` or `.zip` | Portable: run the exe from any folder. |
-| macOS 11 or later | `nit-<version>-macos-arm64.dmg` (Apple silicon), `nit-<version>-macos-x86_64.dmg` (Intel) | Open the disk image and drag nit to Applications. |
+| macOS 11 or later | `nit-<version>-macos-x86_64.dmg` (Intel; runs on Apple silicon under Rosetta 2) | Open the disk image and drag nit to Applications. |
 | Debian 12+, Ubuntu 22.04+ | `nit-<version>-linux-x86_64.deb` | `sudo apt install ./nit-<version>-linux-x86_64.deb` |
 | Fedora, openSUSE | `nit-<version>-linux-x86_64.rpm` | `sudo dnf install ./nit-<version>-linux-x86_64.rpm` (`zypper install` on openSUSE) |
 | Other Linux | `nit-<version>-linux-x86_64.AppImage` or `.tar.gz` | `chmod +x nit-*.AppImage` and run it, or unpack the archive and run `./nit`. |
