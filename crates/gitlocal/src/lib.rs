@@ -269,6 +269,8 @@ fn mirror_lock(path: &Path) -> Arc<Mutex<()>> {
         .get_or_init(Default::default)
         .lock()
         .unwrap_or_else(|p| p.into_inner());
+    // Drop locks nobody holds, so the map follows the repositories in use, not every one seen.
+    map.retain(|_, l| Arc::strong_count(l) > 1);
     map.entry(path.to_path_buf()).or_default().clone()
 }
 
