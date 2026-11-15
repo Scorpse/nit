@@ -4,7 +4,7 @@ resolver = "2"
 
 # One version for every crate; a release tag v<version> must match it.
 [workspace.package]
-version = "0.1.0"
+version = "0.1.1"
 
 # Distribution build. Unwinding panics stay on: per-file and worker panics are caught
 # (catch_unwind) and must never take the whole app down, so no `panic = "abort"`.
