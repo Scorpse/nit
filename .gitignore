@@ -1,0 +1,9 @@
+target/
+tools/
+.superpowers/
+*.png
+!assets/*.png
+!packaging/icons/*.png
+target-pack/
+target-step12/
+dist-out/

@@ -1,0 +1,73 @@
+{
+  "id": 861,
+  "head_commit_sha": "5536c4a86d07bdb808b71ea045bde72d9f4ae3eb",
+  "base_commit_sha": "72628a0ed18c99c54b52663a7d0e417a1da8df63",
+  "start_commit_sha": "72628a0ed18c99c54b52663a7d0e417a1da8df63",
+  "created_at": "2026-11-14T14:20:34.925Z",
+  "merge_request_id": 257,
+  "state": "collected",
+  "real_size": "3",
+  "patch_id_sha": "1a4380c545ad185eccb9b626830dc76ca16ec00f",
+  "commits": [
+    {
+      "id": "5536c4a86d07bdb808b71ea045bde72d9f4ae3eb",
+      "short_id": "5536c4a8",
+      "created_at": "2026-11-14T14:20:33.000+00:00",
+      "parent_ids": [
+        "72628a0ed18c99c54b52663a7d0e417a1da8df63"
+      ],
+      "title": "changes",
+      "message": "changes",
+      "author_name": "Administrator",
+      "author_email": "admin@example.com",
+      "authored_date": "2026-11-14T14:20:33.000+00:00",
+      "committer_name": "Administrator",
+      "committer_email": "admin@example.com",
+      "committed_date": "2026-11-14T14:20:33.000+00:00",
+      "trailers": {},
+      "extended_trailers": {},
+      "web_url": "https://gitlab.example:8080/root/nit-live-test/-/commit/5536c4a86d07bdb808b71ea045bde72d9f4ae3eb"
+    }
+  ],
+  "diffs": [
+    {
+      "diff": "@@ -2197,7 +2197,7 @@ big line 2196\n big line 2197\n big line 2198\n big line 2199\n-big line 2200\n+big line 2200 changed\n big line 2201\n big line 2202\n big line 2203\n",
+      "collapsed": false,
+      "too_large": false,
+      "new_path": "big.txt",
+      "old_path": "big.txt",
+      "a_mode": "100644",
+      "b_mode": "100644",
+      "new_file": false,
+      "renamed_file": false,
+      "deleted_file": false,
+      "generated_file": false
+    },
+    {
+      "diff": "@@ -1,5 +1,5 @@\n r1\n r2\n-r3\n+r3 changed\n r4\n r5\n",
+      "collapsed": false,
+      "too_large": false,
+      "new_path": "new-name.txt",
+      "old_path": "old-name.txt",
+      "a_mode": "100644",
+      "b_mode": "100644",
+      "new_file": false,
+      "renamed_file": true,
+      "deleted_file": false,
+      "generated_file": false
+    },
+    {
+      "diff": "@@ -1,10 +1,10 @@\n line 1\n line 2\n-line 3\n line 4\n line 5\n+added A\n line 6\n line 7\n-line 8\n+line 8 changed\n line 9\n line 10\n",
+      "collapsed": false,
+      "too_large": false,
+      "new_path": "small.txt",
+      "old_path": "small.txt",
+      "a_mode": "100644",
+      "b_mode": "100644",
+      "new_file": false,
+      "renamed_file": false,
+      "deleted_file": false,
+      "generated_file": false
+    }
+  ]
+}

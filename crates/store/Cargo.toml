@@ -1,0 +1,30 @@
+[package]
+name = "store"
+version.workspace = true
+license = "MIT OR Apache-2.0"
+edition = "2021"
+
+[dependencies]
+prcore = { path = "../prcore" }
+rusqlite = { version = "0.42", features = ["bundled"] }
+serde_json = "1"
+thiserror = "2"
+
+# The OS credential store per platform (see `secrets.rs`). Without a backend feature keyring
+# falls back to an in-memory mock that loses every token at exit, so each target names one.
+[target.'cfg(windows)'.dependencies]
+keyring = { version = "3", features = ["windows-native"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+keyring = { version = "3", features = ["apple-native"] }
+
+# Linux and the BSDs: the freedesktop Secret Service (GNOME Keyring, KWallet, KeePassXC)
+# over D-Bus, with the session encrypted by pure-Rust crypto (no OpenSSL). Needs libdbus-1
+# (libdbus-1-dev to build); the Secret Service persists across reboots, unlike the kernel
+# keyring of `linux-native`.
+[target.'cfg(all(unix, not(target_os = "macos")))'.dependencies]
+keyring = { version = "3", features = ["sync-secret-service", "crypto-rust"] }
+
+[dev-dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+tempfile = "3"

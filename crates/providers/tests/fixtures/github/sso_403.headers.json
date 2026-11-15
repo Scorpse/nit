@@ -1,0 +1,3 @@
+{
+  "x-github-sso": "required; url=https://github.com/orgs/octo-org/sso?authorization_request=EXAMPLE0000"
+}

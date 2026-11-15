@@ -1,0 +1,82 @@
+name: Coverage
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: coverage
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  coverage:
+    name: Line coverage (badge)
+    runs-on: windows-latest
+    permissions:
+      contents: write # pushes the badge file to the `badges` branch
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov
+
+      # A few tests are timing-sensitive on loaded runners; retry the run once, like CI.
+      - name: Measure
+        shell: pwsh
+        run: |
+          cargo llvm-cov --workspace --locked --json --summary-only --output-path cov.json
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::warning::coverage run failed; retrying once (known timing-sensitive tests)"
+            cargo llvm-cov --workspace --locked --json --summary-only --output-path cov.json
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+      - name: Write the badge file
+        id: badge
+        shell: pwsh
+        run: |
+          $pct = [math]::Round((Get-Content cov.json -Raw | ConvertFrom-Json).data[0].totals.lines.percent, 1)
+          $color = if ($pct -ge 80) { "brightgreen" } elseif ($pct -ge 60) { "green" } elseif ($pct -ge 40) { "yellow" } else { "orange" }
+          $json = @{ schemaVersion = 1; label = "coverage"; message = "$pct%"; color = $color } | ConvertTo-Json -Compress
+          New-Item -ItemType Directory -Force badges-out | Out-Null
+          Set-Content -Path badges-out/coverage.json -Value $json -NoNewline -Encoding utf8
+          Write-Host "line coverage: $pct%"
+
+      # shields.io reads badges/coverage.json from the `badges` branch (an orphan branch
+      # that holds only this file), so no third-party account or token is needed.
+      - name: Publish the badge
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $repo = "https://x-access-token:$($env:GH_TOKEN)@github.com/${{ github.repository }}.git"
+          $dir = Join-Path $env:RUNNER_TEMP "badges"
+          git clone --quiet --depth 1 --branch badges $repo $dir 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            git init --quiet $dir
+            git -C $dir checkout --quiet --orphan badges
+            git -C $dir remote add origin $repo
+          }
+          Copy-Item badges-out/coverage.json (Join-Path $dir "coverage.json") -Force
+          git -C $dir config user.name "github-actions[bot]"
+          git -C $dir config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C $dir add coverage.json
+          git -C $dir diff --cached --quiet
+          if ($LASTEXITCODE -ne 0) {
+            git -C $dir commit --quiet -m "coverage badge"
+            git -C $dir push --quiet origin badges
+          }

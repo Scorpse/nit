@@ -1,0 +1,33 @@
+[
+  {
+    "id": 24,
+    "description": "Throwaway: nit live tests (safe to delete)",
+    "name": "nit-live-test",
+    "name_with_namespace": "Administrator / nit-live-test",
+    "path": "nit-live-test",
+    "path_with_namespace": "root/nit-live-test",
+    "created_at": "2026-11-14T14:20:22.580Z",
+    "default_branch": "main",
+    "tag_list": [],
+    "topics": [],
+    "http_url_to_repo": "https://192.168.1.20:8443/root/nit-live-test.git",
+    "web_url": "https://192.168.1.20:8443/root/nit-live-test",
+    "readme_url": "https://192.168.1.20:8443/root/nit-live-test/-/blob/main/README.md",
+    "forks_count": 0,
+    "avatar_url": null,
+    "star_count": 0,
+    "last_activity_at": "2026-11-14T14:20:22.503Z",
+    "visibility": "private",
+    "namespace": {
+      "id": 2,
+      "name": "Administrator",
+      "path": "root",
+      "kind": "user",
+      "full_path": "root",
+      "parent_id": null,
+      "avatar_url": null,
+      "web_url": "https://192.168.1.20:8443/root"
+    },
+    "repository_storage": "default"
+  }
+]

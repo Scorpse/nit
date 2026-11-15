@@ -1,0 +1,23 @@
+[
+  {
+    "id": 101,
+    "iid": 10,
+    "project_id": 3,
+    "title": "Add widgets (v2)",
+    "state": "opened",
+    "created_at": "2026-11-09T08:00:00.000Z",
+    "updated_at": "2026-11-11T09:00:00.000Z",
+    "target_branch": "main",
+    "source_branch": "feature/widgets",
+    "user_notes_count": 4,
+    "author": { "bot": false, "id": 2, "name": "Sam Bauch", "username": "kenyatta_oconnell", "state": "active" },
+    "reviewers": [
+      { "id": 1, "name": "Administrator", "username": "root", "state": "active" }
+    ],
+    "source_project_id": 3,
+    "target_project_id": 3,
+    "draft": false,
+    "sha": "44444444444444444444444444444444444444aa",
+    "web_url": "https://gitlab.example.com/my-group/sub/my-project/-/merge_requests/10"
+  }
+]

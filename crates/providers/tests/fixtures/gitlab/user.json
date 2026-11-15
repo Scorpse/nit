@@ -1,0 +1,11 @@
+{
+  "id": 1,
+  "username": "root",
+  "name": "Administrator",
+  "state": "active",
+  "bot": false,
+  "avatar_url": null,
+  "web_url": "https://gitlab.example.com/root",
+  "email": "admin@example.com",
+  "locked": false
+}

@@ -1,0 +1,262 @@
+[
+  {
+    "id": "6a9c1750b37d513a43987b574953fceb50b03ce7",
+    "individual_note": false,
+    "notes": [
+      {
+        "id": 1126,
+        "type": "DiffNote",
+        "body": "Should this be configurable?",
+        "attachment": null,
+        "author": { "id": 2, "name": "Sam Bauch", "username": "kenyatta_oconnell", "state": "active" },
+        "created_at": "2026-11-10T09:00:00.000Z",
+        "updated_at": "2026-11-10T09:00:00.000Z",
+        "system": false,
+        "noteable_id": 101,
+        "noteable_type": "MergeRequest",
+        "noteable_iid": 10,
+        "commit_id": null,
+        "position": {
+          "base_sha": "eeb57dffe83deb686a60a71c16c32f71046868fd",
+          "start_sha": "eeb57dffe83deb686a60a71c16c32f71046868fd",
+          "head_sha": "33e2ee8579fda5bc36accc9c6fbd0b4fefda9e30",
+          "old_path": "src/widget.rs",
+          "new_path": "src/widget.rs",
+          "position_type": "text",
+          "old_line": null,
+          "new_line": 12
+        },
+        "resolved": false,
+        "resolvable": true,
+        "resolved_by": null,
+        "resolved_at": null
+      },
+      {
+        "id": 1127,
+        "type": "DiffNote",
+        "body": "Yes, I will add a setting.",
+        "author": { "id": 1, "name": "Administrator", "username": "root", "state": "active" },
+        "created_at": "2026-11-10T09:30:00.000Z",
+        "updated_at": "2026-11-10T09:35:00.000Z",
+        "system": false,
+        "noteable_iid": 10,
+        "position": {
+          "base_sha": "eeb57dffe83deb686a60a71c16c32f71046868fd",
+          "start_sha": "eeb57dffe83deb686a60a71c16c32f71046868fd",
+          "head_sha": "33e2ee8579fda5bc36accc9c6fbd0b4fefda9e30",
+          "old_path": "src/widget.rs",
+          "new_path": "src/widget.rs",
+          "position_type": "text",
+          "old_line": null,
+          "new_line": 12
+        },
+        "resolved": false,
+        "resolvable": true
+      }
+    ]
+  },
+  {
+    "id": "87805b7c09016a7058e91bdbe7b29d1f284a39e6",
+    "individual_note": false,
+    "notes": [
+      {
+        "id": 1128,
+        "type": "DiffNote",
+        "body": "Why was this removed?",
+        "author": { "id": 2, "name": "Sam Bauch", "username": "kenyatta_oconnell" },
+        "created_at": "2026-11-10T09:01:00.000Z",
+        "updated_at": "2026-11-10T09:01:00.000Z",
+        "system": false,
+        "noteable_iid": 10,
+        "position": {
+          "base_sha": "eeb57dffe83deb686a60a71c16c32f71046868fd",
+          "start_sha": "eeb57dffe83deb686a60a71c16c32f71046868fd",
+          "head_sha": "33e2ee8579fda5bc36accc9c6fbd0b4fefda9e30",
+          "old_path": "src/widget.rs",
+          "new_path": "src/widget.rs",
+          "position_type": "text",
+          "old_line": 7,
+          "new_line": null
+        },
+        "resolved": true,
+        "resolvable": true,
+        "resolved_by": { "id": 1, "name": "Administrator", "username": "root" },
+        "resolved_at": "2026-11-10T10:00:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "a1b2c3d4e5f60718293a4b5c6d7e8f9012345678",
+    "individual_note": false,
+    "notes": [
+      {
+        "id": 1129,
+        "type": "DiffNote",
+        "body": "These three lines could be one call.",
+        "author": { "id": 6, "name": "Lee Reviewer", "username": "lee" },
+        "created_at": "2026-11-10T09:02:00.000Z",
+        "updated_at": "2026-11-10T09:02:00.000Z",
+        "system": false,
+        "noteable_iid": 10,
+        "position": {
+          "base_sha": "eeb57dffe83deb686a60a71c16c32f71046868fd",
+          "start_sha": "eeb57dffe83deb686a60a71c16c32f71046868fd",
+          "head_sha": "33e2ee8579fda5bc36accc9c6fbd0b4fefda9e30",
+          "old_path": "src/widget.rs",
+          "new_path": "src/widget.rs",
+          "position_type": "text",
+          "old_line": 20,
+          "new_line": 22,
+          "line_range": {
+            "start": { "line_code": "4b0a5c4e0e1a3d2f6c8b7a9e1d2c3b4a5f6e7d8c_18_20", "type": null, "old_line": 18, "new_line": 20 },
+            "end": { "line_code": "4b0a5c4e0e1a3d2f6c8b7a9e1d2c3b4a5f6e7d8c_20_22", "type": null, "old_line": 20, "new_line": 22 }
+          }
+        },
+        "resolved": false,
+        "resolvable": true
+      }
+    ]
+  },
+  {
+    "id": "b2c3d4e5f6071829304a5b6c7d8e9f0123456789",
+    "individual_note": false,
+    "notes": [
+      {
+        "id": 1130,
+        "type": "DiffNote",
+        "body": "Good rename.",
+        "author": { "id": 6, "name": "Lee Reviewer", "username": "lee" },
+        "created_at": "2026-11-10T09:03:00.000Z",
+        "updated_at": "2026-11-10T09:03:00.000Z",
+        "system": false,
+        "noteable_iid": 10,
+        "position": {
+          "base_sha": "eeb57dffe83deb686a60a71c16c32f71046868fd",
+          "start_sha": "eeb57dffe83deb686a60a71c16c32f71046868fd",
+          "head_sha": "33e2ee8579fda5bc36accc9c6fbd0b4fefda9e30",
+          "old_path": "src/old_name.rs",
+          "new_path": "src/new_name.rs",
+          "position_type": "text",
+          "old_line": null,
+          "new_line": 3
+        },
+        "resolved": false,
+        "resolvable": true
+      }
+    ]
+  },
+  {
+    "id": "c3d4e5f607182930415a6b7c8d9e0f1234567890",
+    "individual_note": false,
+    "notes": [
+      {
+        "id": 1131,
+        "type": "DiffNote",
+        "body": "Please add a section about setup.",
+        "author": { "id": 2, "name": "Sam Bauch", "username": "kenyatta_oconnell" },
+        "created_at": "2026-11-10T09:04:00.000Z",
+        "updated_at": "2026-11-10T09:04:00.000Z",
+        "system": false,
+        "noteable_iid": 10,
+        "position": {
+          "base_sha": "eeb57dffe83deb686a60a71c16c32f71046868fd",
+          "start_sha": "eeb57dffe83deb686a60a71c16c32f71046868fd",
+          "head_sha": "33e2ee8579fda5bc36accc9c6fbd0b4fefda9e30",
+          "old_path": "README.md",
+          "new_path": "README.md",
+          "position_type": "file"
+        },
+        "resolved": false,
+        "resolvable": true
+      }
+    ]
+  },
+  {
+    "id": "d4e5f60718293041526a7b8c9d0e1f2345678901",
+    "individual_note": false,
+    "notes": [
+      {
+        "id": 1132,
+        "type": "DiffNote",
+        "body": "This was on the first push.",
+        "author": { "id": 2, "name": "Sam Bauch", "username": "kenyatta_oconnell" },
+        "created_at": "2026-11-09T09:05:00.000Z",
+        "updated_at": "2026-11-09T09:05:00.000Z",
+        "system": false,
+        "noteable_iid": 10,
+        "position": {
+          "base_sha": "eeb57dffe83deb686a60a71c16c32f71046868fd",
+          "start_sha": "eeb57dffe83deb686a60a71c16c32f71046868fd",
+          "head_sha": "0b4bc9a49b562e85de7cc9e834518ea6828729b9",
+          "old_path": "src/widget.rs",
+          "new_path": "src/widget.rs",
+          "position_type": "text",
+          "old_line": null,
+          "new_line": 40
+        },
+        "resolved": false,
+        "resolvable": true
+      }
+    ]
+  },
+  {
+    "id": "e5f6071829304152637a8b9c0d1e2f3456789012",
+    "individual_note": true,
+    "notes": [
+      {
+        "id": 1133,
+        "type": null,
+        "body": "Thanks, looks good overall.",
+        "author": { "id": 7, "name": "Pat Approver", "username": "pat" },
+        "created_at": "2026-11-10T09:06:00.000Z",
+        "updated_at": "2026-11-10T09:06:00.000Z",
+        "system": false,
+        "noteable_iid": 10,
+        "resolved": false,
+        "resolvable": false
+      }
+    ]
+  },
+  {
+    "id": "f60718293041526374a8b9c0d1e2f34567890123",
+    "individual_note": true,
+    "notes": [
+      {
+        "id": 1134,
+        "type": null,
+        "body": "added 1 commit",
+        "author": { "id": 2, "name": "Sam Bauch", "username": "kenyatta_oconnell" },
+        "created_at": "2026-11-10T09:07:00.000Z",
+        "updated_at": "2026-11-10T09:07:00.000Z",
+        "system": true,
+        "noteable_iid": 10,
+        "resolvable": false
+      }
+    ]
+  },
+  {
+    "id": "071829304152637485a9b0c1d2e3f45678901234",
+    "individual_note": false,
+    "notes": [
+      {
+        "id": 1135,
+        "type": "DiscussionNote",
+        "body": "Pipeline report: 2 warnings.",
+        "author": { "id": 8, "bot": true, "name": "Renovate Bot", "username": "project_3_bot_5f2a" },
+        "created_at": "2026-11-10T09:08:00.000Z",
+        "updated_at": "2026-11-10T09:08:00.000Z",
+        "system": false,
+        "noteable_iid": 10,
+        "resolved": false,
+        "resolvable": true
+      },
+      {
+        "type": "DiscussionNote",
+        "body": "a note without an id",
+        "author": { "id": 2, "name": "Sam Bauch", "username": "kenyatta_oconnell" },
+        "created_at": "2026-11-10T09:09:00.000Z",
+        "system": false
+      }
+    ]
+  }
+]

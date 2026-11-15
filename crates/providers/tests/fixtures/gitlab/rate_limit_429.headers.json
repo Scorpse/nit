@@ -1,0 +1,6 @@
+{
+  "retry-after": "{retry_after}",
+  "ratelimit-limit": "2000",
+  "ratelimit-remaining": "0",
+  "ratelimit-resettime": "Tue, 10 Nov 2026 10:01:00 GMT"
+}

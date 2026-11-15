@@ -1,0 +1,11 @@
+{"pagelen":50,"page":1,"values":[
+{"id":7,"title":"From a fork","state":"OPEN",
+ "author":{"uuid":"{x}","display_name":"Forker"},
+ "source":{"branch":{"name":"patch-1"},"commit":{"hash":"aa"},"repository":{"full_name":"forker/api"}},
+ "destination":{"branch":{"name":"main"},"commit":{"hash":"bb"}},
+ "participants":[],"created_on":"2026-03-01T10:00:00.000000+00:00","updated_on":"2026-03-01T10:00:00.000000+00:00"},
+{"id":8,"title":"From a deleted fork","state":"OPEN",
+ "author":{"uuid":"{x}","display_name":"Ghost"},
+ "source":{"branch":{"name":"gone"},"commit":{"hash":"cc"},"repository":null},
+ "destination":{"branch":{"name":"main"},"commit":{"hash":"dd"}},
+ "participants":[],"created_on":"2026-03-01T10:00:00.000000+00:00","updated_on":"2026-03-01T10:00:00.000000+00:00"}]}

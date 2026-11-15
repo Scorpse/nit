@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.scorpse.nit</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT OR Apache-2.0</project_license>
+  <name>nit</name>
+  <summary>Fast, local pull request review</summary>
+  <description>
+    <p>
+      nit reviews pull requests and merge requests from Bitbucket Cloud, GitHub and GitLab.
+      One inbox shows the pull requests that concern you; the review screen shows a fast,
+      syntax-highlighted diff computed locally with git.
+    </p>
+    <ul>
+      <li>Several accounts and forges in one inbox, cached for offline use</li>
+      <li>Inline, file and pull request comments written as drafts and posted after you confirm</li>
+      <li>Approve and request changes, checked against the current state of the pull request</li>
+      <li>Stacked pull requests detected, with advice on review and merge order</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">nit.desktop</launchable>
+  <url type="homepage">https://github.com/Scorpse/nit</url>
+  <url type="bugtracker">https://github.com/Scorpse/nit/issues</url>
+  <developer id="io.github.scorpse">
+    <name>The nit contributors</name>
+  </developer>
+  <provides>
+    <binary>nit</binary>
+  </provides>
+  <content_rating type="oars-1.1"/>
+</component>

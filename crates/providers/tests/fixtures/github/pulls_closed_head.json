@@ -1,0 +1,49 @@
+[
+  {
+    "html_url": "https://github.com/octo-org/api/pull/1300",
+    "node_id": "MDExOlB1bGxSZXF1ZXN0MTMwMA==",
+    "number": 1300,
+    "state": "closed",
+    "locked": false,
+    "title": "Parent change",
+    "user": {"login": "hubot", "id": 2, "type": "User"},
+    "created_at": "2011-01-20T19:01:12Z",
+    "updated_at": "2011-01-25T19:01:12Z",
+    "closed_at": "2011-01-25T19:01:12Z",
+    "merged_at": "2011-01-25T19:01:12Z",
+    "requested_reviewers": [],
+    "head": {"ref": "base-topic", "sha": "1111111111111111111111111111111111111111", "repo": {"full_name": "octo-org/api"}},
+    "base": {"ref": "main", "sha": "2222222222222222222222222222222222222222", "repo": {"full_name": "octo-org/api"}},
+    "draft": false
+  },
+  {
+    "html_url": "https://github.com/octo-org/api/pull/1299",
+    "node_id": "MDExOlB1bGxSZXF1ZXN0MTI5OQ==",
+    "number": 1299,
+    "state": "closed",
+    "locked": false,
+    "title": "Abandoned attempt",
+    "user": {"login": "hubot", "id": 2, "type": "User"},
+    "created_at": "2011-01-19T19:01:12Z",
+    "updated_at": "2011-01-21T19:01:12Z",
+    "closed_at": "2011-01-21T19:01:12Z",
+    "merged_at": null,
+    "requested_reviewers": [],
+    "head": {"ref": "base-topic", "sha": "3333333333333333333333333333333333333333", "repo": {"full_name": "octo-org/api"}},
+    "base": {"ref": "main", "sha": "2222222222222222222222222222222222222222", "repo": {"full_name": "octo-org/api"}},
+    "draft": false
+  },
+  {
+    "html_url": "https://github.com/octo-org/api/pull/1298",
+    "number": 1298,
+    "state": "closed",
+    "title": "Entry with a broken head",
+    "user": {"login": "hubot", "id": 2, "type": "User"},
+    "created_at": "2011-01-18T19:01:12Z",
+    "updated_at": "2011-01-18T19:01:12Z",
+    "merged_at": "2011-01-18T19:01:12Z",
+    "head": {"ref": 42, "sha": "4444444444444444444444444444444444444444"},
+    "base": {"ref": "main", "sha": "2222222222222222222222222222222222222222"},
+    "draft": false
+  }
+]

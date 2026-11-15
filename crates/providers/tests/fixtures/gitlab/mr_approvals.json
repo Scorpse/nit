@@ -1,0 +1,11 @@
+{
+  "user_has_approved": false,
+  "user_can_approve": true,
+  "approved": true,
+  "approved_by": [
+    {
+      "user": { "id": 7, "name": "Pat Approver", "username": "pat", "state": "active" },
+      "approved_at": "2026-11-10T09:00:00.000Z"
+    }
+  ]
+}

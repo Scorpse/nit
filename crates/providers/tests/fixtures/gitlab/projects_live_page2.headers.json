@@ -1,0 +1,9 @@
+{
+  "link": "<https://192.168.1.20:8443/api/v4/projects?archived=false&imported=false&membership=true&order_by=created_at&owned=false&page=12&per_page=1&simple=true&sort=desc&starred=false&statistics=false&with_custom_attributes=false&with_issues_enabled=false&with_merge_requests_enabled=false>; rel=\"prev\", <https://192.168.1.20:8443/api/v4/projects?archived=false&imported=false&membership=true&order_by=created_at&owned=false&page=1&per_page=1&simple=true&sort=desc&starred=false&statistics=false&with_custom_attributes=false&with_issues_enabled=false&with_merge_requests_enabled=false>; rel=\"first\", <https://192.168.1.20:8443/api/v4/projects?archived=false&imported=false&membership=true&order_by=created_at&owned=false&page=13&per_page=1&simple=true&sort=desc&starred=false&statistics=false&with_custom_attributes=false&with_issues_enabled=false&with_merge_requests_enabled=false>; rel=\"last\"",
+  "x-next-page": "",
+  "x-page": "2",
+  "x-per-page": "1",
+  "x-prev-page": "12",
+  "x-total": "13",
+  "x-total-pages": "13"
+}

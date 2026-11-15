@@ -1,0 +1,322 @@
+name: Release
+
+# A tag v<version> builds every package and publishes a GitHub Release (a pre-release when the
+# version has a suffix such as -rc.1). A manual run builds the same files and keeps them as
+# workflow artifacts only. Packaging inputs and how to run them locally: packaging/README.md.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+# bash -eo pipefail everywhere (Git Bash on Windows) unless a step says otherwise
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  meta:
+    name: Version and release notes
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v7
+
+      # Every crate inherits [workspace.package] version; a tag must name exactly that version.
+      - name: Read the version and check the tag
+        id: version
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          versions=$(cargo metadata --no-deps --locked --format-version 1 | jq -r '[.packages[].version] | unique | .[]')
+          if [ "$(printf '%s\n' "$versions" | wc -l)" -ne 1 ]; then
+            echo "::error::The workspace crates have different versions: ${versions//$'\n'/, }"
+            exit 1
+          fi
+          version=$versions
+          if [ "$REF_TYPE" = tag ] && [ "$REF_NAME" != "v$version" ]; then
+            echo "::error::Tag $REF_NAME does not match the crate version $version (expected v$version)"
+            exit 1
+          fi
+          case $version in *-*) prerelease=true ;; *) prerelease=false ;; esac
+          echo "version=$version" >>"$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >>"$GITHUB_OUTPUT"
+
+      - name: Release notes from CHANGELOG.md
+        if: github.event_name == 'push'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          PRIVATE: ${{ github.event.repository.private }}
+        run: |
+          # the "## [<version>]" section, up to the next section or the link definitions
+          awk -v head="## [$VERSION]" '
+            /^## \[/ { if (inside) exit; inside = index($0, head) == 1; next }
+            inside && /^\[[^]]+\]: / { exit }
+            inside { print }
+          ' CHANGELOG.md | sed -e '/[^[:space:]]/,$!d' >release-notes.md
+          if ! grep -q '[^[:space:]]' release-notes.md; then
+            echo "::error::CHANGELOG.md has no '## [$VERSION]' section (or it is empty)"
+            exit 1
+          fi
+          { echo; sed "s/@VERSION@/$VERSION/g" packaging/release-notes.md; } >>release-notes.md
+          if [ "$PRIVATE" != true ]; then
+            echo >>release-notes.md
+            echo "Each file has a build provenance attestation: \`gh attestation verify <file> --repo $GITHUB_REPOSITORY\`" >>release-notes.md
+          fi
+
+      - name: Keep the release notes
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-notes
+          path: release-notes.md
+          if-no-files-found: error
+
+  windows:
+    name: Windows x86_64
+    needs: meta
+    runs-on: windows-latest
+    env:
+      VERSION: ${{ needs.meta.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: cargo build --release --locked -p app
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: |
+          if (-not (Get-Command iscc -ErrorAction SilentlyContinue) -and
+              -not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup --no-progress -y
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+      # portable exe, zip (exe, README, licences) and the installer
+      - name: Package
+        shell: pwsh
+        run: |
+          $v = $env:VERSION
+          $name = "nit-$v-windows-x86_64"
+          $exe = "target\release\nit.exe"
+          $reported = (& $exe --version | Out-String).Trim()
+          if ($reported -ne "nit $v") { throw "$exe reports '$reported', expected 'nit $v'" }
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Copy-Item $exe "dist\$name.exe"
+          $stage = Join-Path $env:RUNNER_TEMP $name
+          New-Item -ItemType Directory -Force $stage | Out-Null
+          Copy-Item $exe, README.md, LICENSE-MIT, LICENSE-APACHE, THIRD-PARTY-NOTICES.md $stage
+          Compress-Archive -Path $stage -DestinationPath "dist\$name.zip"
+          $iscc = (Get-Command iscc -ErrorAction SilentlyContinue).Source
+          if (-not $iscc) { $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" }
+          & $iscc /Q "/DAppVersion=$v" "/DSourceExe=$PWD\$exe" "/DOutputDir=$PWD\dist" packaging\windows\nit.iss
+          if ($LASTEXITCODE -ne 0) { throw "ISCC failed" }
+          Get-ChildItem dist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: nit-windows-x86_64
+          path: dist/*
+          if-no-files-found: error
+
+  linux:
+    name: Linux ${{ matrix.arch }}
+    needs: meta
+    runs-on: ${{ matrix.runner }}
+    # Built on Ubuntu 22.04 (glibc 2.35) so the packages also run on older distributions
+    # than the runner's own.
+    container: ubuntu:22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            arch: x86_64
+            appimagetool-sha256: ed4ce84f0d9caff66f50bcca6ff6f35aae54ce8135408b3fa33abfc3cb384eb0
+            runtime-sha256: 2fca8b443c92510f1483a883f60061ad09b46b978b2631c807cd873a47ec260d
+          - runner: ubuntu-24.04-arm
+            arch: aarch64
+            appimagetool-sha256: f0837e7448a0c1e4e650a93bb3e85802546e60654ef287576f46c71c126a9158
+            runtime-sha256: 00cbdfcf917cc6c0ff6d3347d59e0ca1f7f45a6df1a428a0d6d8a78664d87444
+    env:
+      VERSION: ${{ needs.meta.outputs.version }}
+    steps:
+      # build: C compiler, pkg-config, libdbus (Secret Service); git for the checkout;
+      # desktop-file-utils lets appimagetool check the desktop file
+      - name: Build dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends build-essential pkg-config libdbus-1-dev \
+            curl ca-certificates xz-utils git file desktop-file-utils
+
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.arch }}
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deb@3.8.0,cargo-generate-rpm@0.21.1
+
+      - name: appimagetool 1.9.1 and its runtime
+        env:
+          ARCH: ${{ matrix.arch }}
+          TOOL_SHA256: ${{ matrix.appimagetool-sha256 }}
+          RUNTIME_SHA256: ${{ matrix.runtime-sha256 }}
+        run: |
+          tools=$RUNNER_TEMP/appimage
+          mkdir -p "$tools"
+          curl -fsSL -o "$tools/appimagetool" \
+            "https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-$ARCH.AppImage"
+          curl -fsSL -o "$tools/runtime" \
+            "https://github.com/AppImage/type2-runtime/releases/download/20251108/runtime-$ARCH"
+          printf '%s  %s\n' "$TOOL_SHA256" "$tools/appimagetool" "$RUNTIME_SHA256" "$tools/runtime" | sha256sum -c
+          chmod +x "$tools/appimagetool"
+          echo "APPIMAGETOOL=$tools/appimagetool" >>"$GITHUB_ENV"
+          echo "APPIMAGE_RUNTIME=$tools/runtime" >>"$GITHUB_ENV"
+
+      - name: Build
+        run: cargo build --release --locked -p app
+
+      - name: Package
+        env:
+          # no FUSE in the container: appimagetool runs extracted
+          APPIMAGE_EXTRACT_AND_RUN: 1
+        run: bash packaging/linux/package.sh "$VERSION" dist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: nit-linux-${{ matrix.arch }}
+          path: |
+            dist/*.deb
+            dist/*.rpm
+            dist/*.AppImage
+            dist/*.tar.gz
+          if-no-files-found: error
+
+  macos:
+    name: macOS ${{ matrix.arch }}
+    needs: meta
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-latest
+            arch: arm64
+          - runner: macos-15-intel
+            arch: x86_64
+    env:
+      VERSION: ${{ needs.meta.outputs.version }}
+      ARCH: ${{ matrix.arch }}
+      MACOSX_DEPLOYMENT_TARGET: "11.0"
+      # Optional. Without them the app is only ad-hoc signed and not notarised.
+      MACOS_CERTIFICATE_P12: ${{ secrets.MACOS_CERTIFICATE_P12 }}
+      MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+      MACOS_SIGNING_IDENTITY: ${{ secrets.MACOS_SIGNING_IDENTITY }}
+      MACOS_NOTARY_APPLE_ID: ${{ secrets.MACOS_NOTARY_APPLE_ID }}
+      MACOS_NOTARY_TEAM_ID: ${{ secrets.MACOS_NOTARY_TEAM_ID }}
+      MACOS_NOTARY_PASSWORD: ${{ secrets.MACOS_NOTARY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: cargo build --release --locked -p app
+
+      - name: App bundle
+        run: bash packaging/macos/bundle.sh app "$VERSION" dist
+
+      - name: Sign with the Developer ID
+        if: env.MACOS_CERTIFICATE_P12 != ''
+        run: |
+          keychain=$RUNNER_TEMP/signing.keychain-db
+          password=$(openssl rand -hex 16)
+          echo "$MACOS_CERTIFICATE_P12" | base64 --decode >"$RUNNER_TEMP/cert.p12"
+          security create-keychain -p "$password" "$keychain"
+          security set-keychain-settings -lut 21600 "$keychain"
+          security unlock-keychain -p "$password" "$keychain"
+          security import "$RUNNER_TEMP/cert.p12" -k "$keychain" -P "$MACOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          rm "$RUNNER_TEMP/cert.p12"
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$password" "$keychain"
+          security list-keychains -d user -s "$keychain"
+          codesign --force --options runtime --timestamp --sign "$MACOS_SIGNING_IDENTITY" dist/nit.app
+          codesign --verify --strict --verbose=2 dist/nit.app
+
+      - name: Disk image and archive
+        run: bash packaging/macos/bundle.sh dmg "$VERSION" "$ARCH" dist
+
+      - name: Notarise
+        if: env.MACOS_CERTIFICATE_P12 != '' && env.MACOS_NOTARY_APPLE_ID != ''
+        run: |
+          dmg=dist/nit-$VERSION-macos-$ARCH.dmg
+          codesign --force --timestamp --sign "$MACOS_SIGNING_IDENTITY" "$dmg"
+          xcrun notarytool submit "$dmg" --apple-id "$MACOS_NOTARY_APPLE_ID" \
+            --team-id "$MACOS_NOTARY_TEAM_ID" --password "$MACOS_NOTARY_PASSWORD" --wait
+          xcrun stapler staple "$dmg"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: nit-macos-${{ matrix.arch }}
+          path: |
+            dist/*.dmg
+            dist/*.tar.gz
+          if-no-files-found: error
+
+  release:
+    name: GitHub Release
+    needs: [meta, windows, linux, macos]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write      # create the GitHub Release
+      id-token: write      # build provenance attestation
+      attestations: write  # build provenance attestation
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: nit-*
+          path: dist
+          merge-multiple: true
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-notes
+
+      - name: Checksums
+        working-directory: dist
+        run: |
+          sha256sum -- * >SHA256SUMS
+          cat SHA256SUMS
+
+      # Attestations need a public repository (or GitHub Enterprise Cloud), so this is
+      # skipped while the repository is private.
+      - name: Build provenance attestation
+        if: ${{ !github.event.repository.private }}
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: dist/*
+
+      - name: Create the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+          PRERELEASE: ${{ needs.meta.outputs.prerelease }}
+        run: |
+          args=("$TAG" dist/* --title "nit $TAG" --notes-file release-notes.md --verify-tag)
+          if [ "$PRERELEASE" = true ]; then args+=(--prerelease); fi
+          gh release create "${args[@]}"

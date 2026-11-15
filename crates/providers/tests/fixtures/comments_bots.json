@@ -1,0 +1,9 @@
+{"pagelen":100,"values":[
+{"id":101,"type":"pullrequest_comment","user":{"type":"app_user","links":{"avatar":null}},"content":{"raw":"Rovo Dev found a possible null dereference."},"created_on":"2026-01-05T10:00:00.000000+00:00","updated_on":"2026-01-05T10:00:00.000000+00:00","deleted":false,"pending":false,"inline":{"path":"src/a.rs","from":null,"to":3}},
+{"id":102,"type":"pullrequest_comment","user":{"type":"app_user","account_id":"5d1c:rovo-app","kind":"forge"},"content":{"raw":"Summary of changes."},"created_on":"2026-01-05T10:01:00.000000+00:00","updated_on":"2026-01-05T10:01:00.000000+00:00"},
+{"id":103,"type":"pullrequest_comment","user":{"display_name":"Rovo Dev"},"content":{"raw":"Consider a guard here."},"created_on":"2026-01-05T10:02:00.000000+00:00","updated_on":"2026-01-05T10:02:00.000000+00:00"},
+{"id":104,"type":"pullrequest_comment","user":{"type":"user","uuid":"{33333333-3333-3333-3333-333333333333}","nickname":"sonarcloud-reviewer","links":{"avatar":null}},"content":{"raw":"Quality gate passed."},"created_on":"2026-01-05T10:03:00.000000+00:00","updated_on":"2026-01-05T10:03:00.000000+00:00"},
+{"id":105,"type":"pullrequest_comment","user":{"type":"user","display_name":"Ada Lovelace","uuid":"{11111111-1111-1111-1111-111111111111}"},"content":{"raw":"a human"},"created_on":"2026-01-05T10:04:00.000000+00:00","updated_on":"2026-01-05T10:04:00.000000+00:00"},
+{"id":106,"type":"pullrequest_comment","user":null,"content":{"raw":"no user at all"},"created_on":"2026-01-05T10:05:00.000000+00:00","updated_on":"2026-01-05T10:05:00.000000+00:00"},
+{"id":107,"type":"pullrequest_comment","user":{"type":"team","display_name":"Acme Platform","uuid":"{44444444-4444-4444-4444-444444444444}"},"content":{"raw":"Pipeline report"},"created_on":"2026-01-05T10:06:00.000000+00:00","updated_on":"2026-01-05T10:06:00.000000+00:00"}
+]}

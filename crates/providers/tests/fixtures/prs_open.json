@@ -1,0 +1,19 @@
+{"pagelen":50,"page":1,"size":2,"values":[
+{"type":"pullrequest","id":42,"title":"Add retry logic","state":"OPEN","draft":false,
+ "author":{"type":"user","uuid":"{aaaa}","display_name":"Alice Author"},
+ "source":{"branch":{"name":"feature/retry"},"commit":{"hash":"abc123def456"},"repository":{"full_name":"acme/api"}},
+ "destination":{"branch":{"name":"main"},"commit":{"hash":"fff000eee111"},"repository":{"full_name":"acme/api"}},
+ "comment_count":7,"task_count":2,
+ "participants":[
+  {"type":"participant","user":{"uuid":"{bbbb}","display_name":"Bob Approver"},"role":"REVIEWER","approved":true,"state":"approved"},
+  {"type":"participant","user":{"uuid":"{cccc}","display_name":"Carol Changes"},"role":"REVIEWER","approved":false,"state":"changes_requested"},
+  {"type":"participant","user":{"uuid":"{dddd}","display_name":"Dan Pending"},"role":"REVIEWER","approved":false,"state":null},
+  {"type":"participant","user":{"uuid":"{eeee}","display_name":"Eve Approved Flag"},"role":"REVIEWER","approved":true},
+  {"type":"participant","user":{"uuid":"{ffff}","display_name":"Frank Commenter"},"role":"PARTICIPANT","approved":false,"state":null}],
+ "created_on":"2026-03-01T10:00:00.000000+00:00","updated_on":"2026-03-02T11:30:15.250000+00:00"},
+{"type":"pullrequest","id":43,"title":"WIP: refactor","state":"OPEN","draft":true,
+ "author":{"uuid":"{aaaa}","display_name":"Alice Author"},
+ "source":{"branch":{"name":"wip"},"commit":{"hash":"1111"},"repository":{"full_name":"acme/api"}},
+ "destination":{"branch":{"name":"main"},"commit":{"hash":"2222"}},
+ "participants":[],
+ "created_on":"2026-03-03T10:00:00.000000+00:00","updated_on":"2026-03-03T10:00:00.000000+00:00"}]}

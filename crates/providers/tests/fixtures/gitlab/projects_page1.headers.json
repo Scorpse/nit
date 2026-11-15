@@ -1,0 +1,6 @@
+{
+  "link": "<{base}/projects?membership=true&archived=false&simple=true&per_page=100&page=2>; rel=\"next\", <{base}/projects?membership=true&archived=false&simple=true&per_page=100&page=1>; rel=\"first\"",
+  "x-page": "1",
+  "x-next-page": "2",
+  "x-per-page": "100"
+}

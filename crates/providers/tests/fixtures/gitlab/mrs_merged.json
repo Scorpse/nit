@@ -1,0 +1,49 @@
+[
+  {
+    "id": 90,
+    "iid": 7,
+    "project_id": 3,
+    "title": "Base topic",
+    "state": "merged",
+    "created_at": "2026-10-01T08:00:00.000Z",
+    "updated_at": "2026-10-03T10:00:00.000Z",
+    "merged_at": "2026-10-03T10:00:00.000Z",
+    "target_branch": "main",
+    "source_branch": "base-topic",
+    "user_notes_count": 0,
+    "author": { "id": 2, "name": "Sam Bauch", "username": "kenyatta_oconnell" },
+    "reviewers": [],
+    "source_project_id": 3,
+    "target_project_id": 3,
+    "sha": "5555555555555555555555555555555555555555",
+    "web_url": "https://gitlab.example.com/my-group/sub/my-project/-/merge_requests/7"
+  },
+  {
+    "id": 91,
+    "iid": 6,
+    "project_id": 3,
+    "title": "Closed without merge",
+    "state": "closed",
+    "created_at": "2026-10-01T08:00:00.000Z",
+    "updated_at": "2026-10-02T10:00:00.000Z",
+    "merged_at": null,
+    "target_branch": "main",
+    "source_branch": "base-topic",
+    "author": { "id": 2, "name": "Sam Bauch", "username": "kenyatta_oconnell" },
+    "source_project_id": 3,
+    "target_project_id": 3,
+    "sha": "6666666666666666666666666666666666666666"
+  },
+  {
+    "id": 92,
+    "iid": 5,
+    "project_id": 3,
+    "title": "Broken entry",
+    "state": "merged",
+    "created_at": "2026-10-01T08:00:00.000Z",
+    "updated_at": "2026-10-02T10:00:00.000Z",
+    "target_branch": "main",
+    "source_project_id": 3,
+    "target_project_id": 3
+  }
+]

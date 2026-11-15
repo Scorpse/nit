@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=nit
+GenericName=Pull Request Review
+Comment=Review pull requests from Bitbucket Cloud, GitHub and GitLab
+Exec=nit
+Icon=nit
+Terminal=false
+Categories=Development;RevisionControl;
+Keywords=git;review;pull request;merge request;diff;
+StartupWMClass=nit

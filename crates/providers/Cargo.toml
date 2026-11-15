@@ -1,0 +1,21 @@
+[package]
+name = "providers"
+version.workspace = true
+license = "MIT OR Apache-2.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "rustls-tls-native-roots", "http2", "gzip", "system-proxy", "json"] }
+serde_json = "1"
+thiserror = "2"
+base64 = "0.23"
+prcore = { path = "../prcore" }
+async-trait = "0.1"
+serde = { version = "1", features = ["derive"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+[dev-dependencies]
+wiremock = "0.6"
+serde_json = "1"
+tokio = { version = "1", features = ["net", "io-util"] }

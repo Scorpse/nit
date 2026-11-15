@@ -1,0 +1,107 @@
+{
+  "data": {
+    "repository": {
+      "pullRequests": {
+        "pageInfo": {"hasNextPage": false, "endCursor": "Y3Vyc29yOnYyOpK5"},
+        "nodes": [
+          {
+            "id": "PR_kwDOA1347", "number": 1347, "title": "Amazing new feature",
+            "url": "https://github.com/octo-org/api/pull/1347",
+            "isDraft": false, "locked": false, "isCrossRepository": false,
+            "createdAt": "2011-01-26T19:01:12Z", "updatedAt": "2011-01-27T19:01:12Z",
+            "additions": 100, "deletions": 3, "changedFiles": 5,
+            "headRefName": "new-topic", "headRefOid": "6dcb09b5b57875f334f61aebed695e2e4193db5e",
+            "baseRefName": "main", "baseRefOid": "6dcb09b5b57875f334f61aebed695e2e4193db5f",
+            "headRepository": {"nameWithOwner": "octo-org/api"},
+            "author": {"__typename": "User", "login": "hubot", "databaseId": 2, "name": "Hubot"},
+            "comments": {"totalCount": 4},
+            "reviewThreads": {"totalCount": 2},
+            "reviewRequests": {"nodes": [
+              {"requestedReviewer": {"__typename": "User", "login": "octocat", "databaseId": 1, "name": "monalisa octocat"}}
+            ]},
+            "latestReviews": {"nodes": []}
+          },
+          {
+            "id": "PR_kwDOA1348", "number": 1348, "title": "Team review wanted",
+            "url": "https://github.com/octo-org/api/pull/1348",
+            "isDraft": false, "locked": false, "isCrossRepository": false,
+            "createdAt": "2011-01-26T19:01:12Z", "updatedAt": "2011-01-26T20:01:12Z",
+            "additions": 10, "deletions": 0, "changedFiles": 1,
+            "headRefName": "team-topic", "headRefOid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "baseRefName": "main", "baseRefOid": "6dcb09b5b57875f334f61aebed695e2e4193db5f",
+            "headRepository": {"nameWithOwner": "octo-org/api"},
+            "author": {"__typename": "User", "login": "monalisa", "databaseId": 3, "name": null},
+            "comments": {"totalCount": 0},
+            "reviewThreads": {"totalCount": 0},
+            "reviewRequests": {"nodes": [
+              {"requestedReviewer": {"__typename": "Team", "slug": "reviewers", "name": "Reviewers", "organization": {"login": "octo-org"}}}
+            ]},
+            "latestReviews": {"nodes": []}
+          },
+          {
+            "id": "PR_kwDOA1349", "number": 1349, "title": "New commits after my review",
+            "url": "https://github.com/octo-org/api/pull/1349",
+            "isDraft": false, "locked": false, "isCrossRepository": false,
+            "createdAt": "2011-01-26T19:01:12Z", "updatedAt": "2011-01-26T21:01:12Z",
+            "additions": 7, "deletions": 7, "changedFiles": 2,
+            "headRefName": "pushed-topic", "headRefOid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "baseRefName": "new-topic", "baseRefOid": "6dcb09b5b57875f334f61aebed695e2e4193db5e",
+            "headRepository": {"nameWithOwner": "octo-org/api"},
+            "author": {"__typename": "User", "login": "hubot", "databaseId": 2, "name": "Hubot"},
+            "comments": {"totalCount": 1},
+            "reviewThreads": {"totalCount": 0},
+            "reviewRequests": {"nodes": []},
+            "latestReviews": {"nodes": [
+              {"state": "COMMENTED", "submittedAt": "2011-01-26T20:30:00Z", "commit": {"oid": "cccccccccccccccccccccccccccccccccccccccc"},
+               "author": {"__typename": "User", "login": "octocat", "databaseId": 1, "name": "monalisa octocat"}}
+            ]}
+          },
+          {
+            "id": "PR_kwDOA1350", "number": 1350, "title": "Fix typo from a fork",
+            "url": "https://github.com/octo-org/api/pull/1350",
+            "isDraft": false, "locked": false, "isCrossRepository": true,
+            "createdAt": "2011-01-26T19:01:12Z", "updatedAt": "2011-01-26T22:01:12Z",
+            "additions": 1, "deletions": 1, "changedFiles": 1,
+            "headRefName": "patch-1", "headRefOid": "dddddddddddddddddddddddddddddddddddddddd",
+            "baseRefName": "main", "baseRefOid": "6dcb09b5b57875f334f61aebed695e2e4193db5f",
+            "headRepository": {"nameWithOwner": "forker/api"},
+            "author": {"__typename": "User", "login": "forker", "databaseId": 4, "name": "Forker"},
+            "comments": {"totalCount": 0},
+            "reviewThreads": {"totalCount": 0},
+            "reviewRequests": {"nodes": []},
+            "latestReviews": {"nodes": [
+              {"state": "APPROVED", "submittedAt": "2011-01-26T21:30:00Z", "commit": {"oid": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"},
+               "author": {"__typename": "User", "login": "octocat", "databaseId": 1, "name": "monalisa octocat"}},
+              {"state": "CHANGES_REQUESTED", "submittedAt": "2011-01-26T21:40:00Z", "commit": {"oid": "dddddddddddddddddddddddddddddddddddddddd"},
+               "author": {"__typename": "User", "login": "hubot", "databaseId": 2, "name": "Hubot"}}
+            ]}
+          },
+          {
+            "id": "PR_kwDOA1351", "number": 1351, "title": "My own draft",
+            "url": "https://github.com/octo-org/api/pull/1351",
+            "isDraft": true, "locked": false, "isCrossRepository": false,
+            "createdAt": "2011-01-26T19:01:12Z", "updatedAt": "2011-01-26T23:01:12Z",
+            "additions": 4000, "deletions": 0, "changedFiles": 3100,
+            "headRefName": "big", "headRefOid": "ffffffffffffffffffffffffffffffffffffffff",
+            "baseRefName": "main", "baseRefOid": "6dcb09b5b57875f334f61aebed695e2e4193db5f",
+            "headRepository": null,
+            "author": {"__typename": "User", "login": "octocat", "databaseId": 1, "name": "monalisa octocat"},
+            "comments": {"totalCount": 0},
+            "reviewThreads": {"totalCount": 0},
+            "reviewRequests": {"nodes": []},
+            "latestReviews": {"nodes": []}
+          },
+          {
+            "id": "PR_kwDOA1352", "number": 1352, "title": null,
+            "url": "https://github.com/octo-org/api/pull/1352",
+            "isDraft": false, "locked": false, "isCrossRepository": false,
+            "createdAt": "2011-01-26T19:01:12Z", "updatedAt": "2011-01-26T23:02:12Z",
+            "headRefName": "broken", "headRefOid": "9999999999999999999999999999999999999999",
+            "baseRefName": "main", "baseRefOid": "6dcb09b5b57875f334f61aebed695e2e4193db5f",
+            "author": null
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "x-oauth-scopes": "repo, read:org",
+  "x-accepted-oauth-scopes": "",
+  "x-ratelimit-limit": "5000",
+  "x-ratelimit-remaining": "4999",
+  "x-ratelimit-used": "1",
+  "x-ratelimit-reset": "1700000000",
+  "x-ratelimit-resource": "core",
+  "x-github-api-version-selected": "2022-11-28"
+}

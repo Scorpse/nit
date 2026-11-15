@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    # The job names are the required checks of branch protection: keep them unique and
+    # stable.
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows (fmt, clippy, test)
+            os: windows-latest
+            fmt: true
+          - name: Linux (fmt, clippy, test)
+            os: ubuntu-latest
+            fmt: true
+          - name: macOS (clippy, test)
+            os: macos-latest # arm64
+            fmt: false
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      # Build: pkg-config and libdbus-1-dev (the keyring's Secret Service backend). Every
+      # other system library (X11, Wayland, xkbcommon, Vulkan, GL, libdbus for the folder
+      # dialog) is loaded at run time, so the tests need nothing else.
+      - name: Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends pkg-config libdbus-1-dev
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: cargo fmt
+        if: matrix.fmt
+        run: cargo fmt --all -- --check
+
+      - name: cargo clippy
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+
+      # A few tests are timing-sensitive on loaded runners (highlight "chunked",
+      # service "the_hunk_on_screen_is_coloured_first", store writer
+      # "failure_is_reported_once"). Instead of ignoring them, the whole test run is
+      # retried once; a second failure fails the job.
+      - name: cargo test (one retry)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          cargo test --workspace --locked
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::warning::cargo test failed; retrying once (known timing-sensitive tests)"
+            cargo test --workspace --locked
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+      - name: cargo test (one retry)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          cargo test --workspace --locked || {
+            echo "::warning::cargo test failed; retrying once (known timing-sensitive tests)"
+            cargo test --workspace --locked
+          }
+
+  deny:
+    name: cargo deny
+    # cargo-deny-action is a container action, so it needs a Linux runner; it only
+    # reads Cargo.lock and the manifests, it does not build.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check

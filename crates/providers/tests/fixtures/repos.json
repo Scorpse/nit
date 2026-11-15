@@ -1,0 +1,6 @@
+{"pagelen":100,"page":1,"values":[
+{"type":"repository","full_name":"acme/api","slug":"api","name":"API Service","is_private":true},
+{"type":"repository","full_name":"acme/web","slug":"web","name":"web"},
+{"type":"repository","full_name":"no-slash","slug":"x"},
+{"type":"repository","full_name":"a/b/c","slug":"c"},
+{"type":"repository","slug":"missing-full-name"}]}

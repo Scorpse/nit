@@ -1,0 +1,4 @@
+{"pagelen":2,"page":1,"values":[
+{"type":"diffstat","status":"modified","lines_added":10,"lines_removed":2,"new":{"path":"a.rs"},"old":{"path":"a.rs"}},
+{"type":"diffstat","status":"added","lines_added":300,"lines_removed":0,"new":{"path":"b.rs"},"old":null}],
+"next":"@NEXT@"}

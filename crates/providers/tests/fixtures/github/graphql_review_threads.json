@@ -1,0 +1,103 @@
+{
+  "data": {
+    "repository": {
+      "pullRequest": {
+        "reviewThreads": {
+          "pageInfo": {"hasNextPage": false, "endCursor": "Y3Vyc29yOnYyOpHO"},
+          "nodes": [
+            {
+              "id": "PRRT_kwDOAthreadA", "isResolved": false, "isOutdated": false,
+              "viewerCanResolve": true, "viewerCanUnresolve": false,
+              "path": "src/main.rs", "line": 12, "originalLine": 12,
+              "startLine": null, "originalStartLine": null,
+              "diffSide": "RIGHT", "startDiffSide": null, "subjectType": "LINE",
+              "comments": {
+                "pageInfo": {"hasNextPage": false, "endCursor": "Y3Vyc29yOnYyOpHOA"},
+                "nodes": [
+                  {"id": "PRRC_kwDOAc101", "databaseId": 101, "body": "Great stuff!",
+                   "createdAt": "2011-04-14T16:00:49Z", "updatedAt": "2011-04-14T16:00:49Z",
+                   "outdated": false, "commit": {"oid": "6dcb09b5b57875f334f61aebed695e2e4193db5e"},
+                   "originalCommit": {"oid": "6dcb09b5b57875f334f61aebed695e2e4193db5e"},
+                   "author": {"__typename": "User", "login": "octocat", "databaseId": 1, "name": "monalisa octocat"}},
+                  {"id": "PRRC_kwDOAc102", "databaseId": 102, "body": "Thanks, fixed.",
+                   "createdAt": "2011-04-14T17:00:49Z", "updatedAt": "2011-04-14T17:05:49Z",
+                   "outdated": false, "commit": {"oid": "6dcb09b5b57875f334f61aebed695e2e4193db5e"},
+                   "originalCommit": {"oid": "6dcb09b5b57875f334f61aebed695e2e4193db5e"},
+                   "author": {"__typename": "User", "login": "hubot", "databaseId": 2, "name": "Hubot"}}
+                ]
+              }
+            },
+            {
+              "id": "PRRT_kwDOAthreadB", "isResolved": false, "isOutdated": false,
+              "viewerCanResolve": true, "viewerCanUnresolve": false,
+              "path": "src/lib.rs", "line": 7, "originalLine": 7,
+              "startLine": 5, "originalStartLine": 5,
+              "diffSide": "LEFT", "startDiffSide": "LEFT", "subjectType": "LINE",
+              "comments": {
+                "pageInfo": {"hasNextPage": false, "endCursor": null},
+                "nodes": [
+                  {"id": "PRRC_kwDOAc103", "databaseId": 103, "body": "Why remove these lines?",
+                   "createdAt": "2011-04-14T16:10:49Z", "updatedAt": "2011-04-14T16:10:49Z",
+                   "outdated": false, "commit": {"oid": "6dcb09b5b57875f334f61aebed695e2e4193db5e"},
+                   "originalCommit": {"oid": "6dcb09b5b57875f334f61aebed695e2e4193db5e"},
+                   "author": {"__typename": "User", "login": "octocat", "databaseId": 1, "name": "monalisa octocat"}}
+                ]
+              }
+            },
+            {
+              "id": "PRRT_kwDOAthreadC", "isResolved": true, "isOutdated": true,
+              "viewerCanResolve": false, "viewerCanUnresolve": true,
+              "path": "src/old.rs", "line": null, "originalLine": 30,
+              "startLine": null, "originalStartLine": null,
+              "diffSide": "RIGHT", "startDiffSide": null, "subjectType": "LINE",
+              "comments": {
+                "pageInfo": {"hasNextPage": false, "endCursor": null},
+                "nodes": [
+                  {"id": "PRRC_kwDOAc104", "databaseId": 104, "body": "This was changed later.",
+                   "createdAt": "2011-04-13T16:10:49Z", "updatedAt": "2011-04-13T16:10:49Z",
+                   "outdated": true, "commit": null,
+                   "originalCommit": {"oid": "0000000000000000000000000000000000000001"},
+                   "author": {"__typename": "Bot", "login": "dependabot", "databaseId": 49699333}}
+                ]
+              }
+            },
+            {
+              "id": "PRRT_kwDOAthreadD", "isResolved": false, "isOutdated": false,
+              "viewerCanResolve": false, "viewerCanUnresolve": false,
+              "path": "README.md", "line": null, "originalLine": null,
+              "startLine": null, "originalStartLine": null,
+              "diffSide": "RIGHT", "startDiffSide": null, "subjectType": "FILE",
+              "comments": {
+                "pageInfo": {"hasNextPage": false, "endCursor": null},
+                "nodes": [
+                  {"id": "PRRC_kwDOAc105", "databaseId": 105, "body": "Whole-file note.",
+                   "createdAt": "2011-04-14T18:10:49Z", "updatedAt": "2011-04-14T18:10:49Z",
+                   "outdated": false, "commit": {"oid": "6dcb09b5b57875f334f61aebed695e2e4193db5e"},
+                   "originalCommit": {"oid": "6dcb09b5b57875f334f61aebed695e2e4193db5e"},
+                   "author": null}
+                ]
+              }
+            },
+            {
+              "id": "PRRT_kwDOAthreadE", "isResolved": false, "isOutdated": false,
+              "viewerCanResolve": true, "viewerCanUnresolve": false,
+              "path": "src/main.rs", "line": 22, "originalLine": 22,
+              "startLine": 19, "originalStartLine": 19,
+              "diffSide": "RIGHT", "startDiffSide": "LEFT", "subjectType": "LINE",
+              "comments": {
+                "pageInfo": {"hasNextPage": true, "endCursor": "Y3Vyc29yOnYyOpE="},
+                "nodes": [
+                  {"id": "PRRC_kwDOAc106", "databaseId": 106, "body": "Range across sides.",
+                   "createdAt": "2011-04-14T19:10:49Z", "updatedAt": "2011-04-14T19:10:49Z",
+                   "outdated": false, "commit": {"oid": "6dcb09b5b57875f334f61aebed695e2e4193db5e"},
+                   "originalCommit": {"oid": "6dcb09b5b57875f334f61aebed695e2e4193db5e"},
+                   "author": {"__typename": "User", "login": "octocat", "databaseId": 1, "name": "monalisa octocat"}}
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

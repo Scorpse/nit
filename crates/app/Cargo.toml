@@ -1,0 +1,122 @@
+[package]
+name = "app"
+version.workspace = true
+license = "MIT OR Apache-2.0"
+edition = "2021"
+description = "Fast, local pull request review for Bitbucket Cloud, GitHub and GitLab"
+homepage = "https://github.com/Scorpse/nit"
+
+[[bin]]
+name = "nit"
+path = "src/main.rs"
+
+[dependencies]
+gitlocal = { path = "../gitlocal" }
+prcore = { path = "../prcore" }
+providers = { path = "../providers" }
+store = { path = "../store" }
+sync = { path = "../sync" }
+chrono = { version = "0.4", features = ["serde"] }
+eframe = { version = "0.37", default-features = false, features = ["wgpu", "default_fonts", "clipboard", "wayland", "x11"] }
+image = { version = "0.25", default-features = false, features = ["png"] }
+rfd = { version = "0.18", default-features = false }
+tempfile = "3"
+syntect = { version = "5", default-features = false, features = ["default-themes", "parsing", "regex-onig"] }
+# bat's syntax set: TypeScript, TSX, TOML, Dockerfile, Kotlin and more that syntect lacks
+two-face = { version = "0.5", default-features = false, features = ["syntect-onig"] }
+serde_json = "1"
+similar = { version = "3", features = ["unicode"] }
+unicode-width = "0.2"
+tokio = { version = "1", features = ["rt-multi-thread", "sync", "macros"] }
+
+# Linux and the BSDs: the folder dialog goes through the XDG desktop portal (D-Bus, with
+# libdbus loaded at run time; zenity is rfd's fallback when no portal runs). No GTK to build
+# or link. `wayland` lets the portal parent the dialog to nit's Wayland window.
+[target.'cfg(all(unix, not(target_os = "macos")))'.dependencies]
+rfd = { version = "0.18", default-features = false, features = ["xdg-portal", "wayland"] }
+
+# statvfs for the free space under the download folder (Settings)
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Security", "Win32_Storage_FileSystem", "Win32_System_Console", "Win32_System_Power", "Win32_System_Threading", "Win32_UI_WindowsAndMessaging"] }
+
+# build.rs: the icon and version information of nit.exe
+[target.'cfg(windows)'.build-dependencies]
+winresource = "0.1"
+
+[dev-dependencies]
+wiremock = "0.6"
+async-trait = "0.1"
+base64 = "0.23"
+
+# Linux packages (packaging/linux/package.sh): `cargo deb` and `cargo generate-rpm`.
+# Paths are relative to this crate; target/release/nit is the release binary.
+[package.metadata.deb]
+name = "nit"
+maintainer = "The nit contributors"
+copyright = "2026 The nit contributors"
+section = "vcs"
+priority = "optional"
+extended-description = """\
+nit reviews pull requests and merge requests from Bitbucket Cloud, GitHub and GitLab: \
+one inbox for every account, a fast diff computed locally with git, comments written as \
+drafts, approve and request changes."""
+# $auto: libc6 and libdbus-1-3 from the binary. libxkbcommon is loaded at run time.
+depends = "$auto, git (>= 1:2.31), libxkbcommon0, xdg-utils"
+# a Secret Service stores the tokens; the portal (or zenity) shows the folder dialog
+recommends = "gnome-keyring | kwallet6 | libkf5wallet-bin | keepassxc, xdg-desktop-portal | zenity"
+assets = [
+    ["target/release/nit", "usr/bin/", "755"],
+    ["../../packaging/linux/nit.desktop", "usr/share/applications/", "644"],
+    ["../../packaging/linux/io.github.scorpse.nit.metainfo.xml", "usr/share/metainfo/", "644"],
+    ["../../packaging/icons/nit-16.png", "usr/share/icons/hicolor/16x16/apps/nit.png", "644"],
+    ["../../packaging/icons/nit-22.png", "usr/share/icons/hicolor/22x22/apps/nit.png", "644"],
+    ["../../packaging/icons/nit-24.png", "usr/share/icons/hicolor/24x24/apps/nit.png", "644"],
+    ["../../packaging/icons/nit-32.png", "usr/share/icons/hicolor/32x32/apps/nit.png", "644"],
+    ["../../packaging/icons/nit-48.png", "usr/share/icons/hicolor/48x48/apps/nit.png", "644"],
+    ["../../packaging/icons/nit-64.png", "usr/share/icons/hicolor/64x64/apps/nit.png", "644"],
+    ["../../packaging/icons/nit-128.png", "usr/share/icons/hicolor/128x128/apps/nit.png", "644"],
+    ["../../packaging/icons/nit-256.png", "usr/share/icons/hicolor/256x256/apps/nit.png", "644"],
+    ["../../packaging/icons/nit-512.png", "usr/share/icons/hicolor/512x512/apps/nit.png", "644"],
+    ["../../README.md", "usr/share/doc/nit/", "644"],
+    ["../../CHANGELOG.md", "usr/share/doc/nit/", "644"],
+    ["../../LICENSE-MIT", "usr/share/doc/nit/", "644"],
+    ["../../LICENSE-APACHE", "usr/share/doc/nit/", "644"],
+    ["../../THIRD-PARTY-NOTICES.md", "usr/share/doc/nit/", "644"],
+]
+
+[package.metadata.generate-rpm]
+name = "nit"
+summary = "Fast, local pull request review"
+url = "https://github.com/Scorpse/nit"
+assets = [
+    { source = "target/release/nit", dest = "/usr/bin/nit", mode = "755" },
+    { source = "../../packaging/linux/nit.desktop", dest = "/usr/share/applications/nit.desktop", mode = "644" },
+    { source = "../../packaging/linux/io.github.scorpse.nit.metainfo.xml", dest = "/usr/share/metainfo/io.github.scorpse.nit.metainfo.xml", mode = "644" },
+    { source = "../../packaging/icons/nit-16.png", dest = "/usr/share/icons/hicolor/16x16/apps/nit.png", mode = "644" },
+    { source = "../../packaging/icons/nit-22.png", dest = "/usr/share/icons/hicolor/22x22/apps/nit.png", mode = "644" },
+    { source = "../../packaging/icons/nit-24.png", dest = "/usr/share/icons/hicolor/24x24/apps/nit.png", mode = "644" },
+    { source = "../../packaging/icons/nit-32.png", dest = "/usr/share/icons/hicolor/32x32/apps/nit.png", mode = "644" },
+    { source = "../../packaging/icons/nit-48.png", dest = "/usr/share/icons/hicolor/48x48/apps/nit.png", mode = "644" },
+    { source = "../../packaging/icons/nit-64.png", dest = "/usr/share/icons/hicolor/64x64/apps/nit.png", mode = "644" },
+    { source = "../../packaging/icons/nit-128.png", dest = "/usr/share/icons/hicolor/128x128/apps/nit.png", mode = "644" },
+    { source = "../../packaging/icons/nit-256.png", dest = "/usr/share/icons/hicolor/256x256/apps/nit.png", mode = "644" },
+    { source = "../../packaging/icons/nit-512.png", dest = "/usr/share/icons/hicolor/512x512/apps/nit.png", mode = "644" },
+    { source = "../../README.md", dest = "/usr/share/doc/nit/README.md", mode = "644", doc = true },
+    { source = "../../CHANGELOG.md", dest = "/usr/share/doc/nit/CHANGELOG.md", mode = "644", doc = true },
+    { source = "../../THIRD-PARTY-NOTICES.md", dest = "/usr/share/doc/nit/THIRD-PARTY-NOTICES.md", mode = "644", doc = true },
+    { source = "../../LICENSE-MIT", dest = "/usr/share/licenses/nit/LICENSE-MIT", mode = "644", doc = true },
+    { source = "../../LICENSE-APACHE", dest = "/usr/share/licenses/nit/LICENSE-APACHE", mode = "644", doc = true },
+]
+# libc and libdbus from the binary; libxkbcommon is loaded at run time
+auto-req = "builtin"
+
+[package.metadata.generate-rpm.requires]
+git-core = ">= 2.31"
+xdg-utils = "*"
+"libxkbcommon.so.0()(64bit)" = "*"
+
+[package.metadata.generate-rpm.recommends]
+xdg-desktop-portal = "*"

@@ -1,0 +1,11 @@
+[
+  {
+    "id": 5,
+    "name": "Website",
+    "path": "website",
+    "path_with_namespace": "root/website",
+    "namespace": { "id": 1, "full_path": "root" },
+    "web_url": "https://gitlab.example.com/root/website",
+    "visibility": "public"
+  }
+]

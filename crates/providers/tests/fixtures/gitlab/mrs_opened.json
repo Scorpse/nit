@@ -1,0 +1,100 @@
+[
+  {
+    "id": 101,
+    "iid": 10,
+    "project_id": 3,
+    "title": "Add widgets",
+    "state": "opened",
+    "created_at": "2026-11-09T08:00:00.000Z",
+    "updated_at": "2026-11-10T10:00:00.000Z",
+    "target_branch": "main",
+    "source_branch": "feature/widgets",
+    "user_notes_count": 3,
+    "author": { "bot": false, "id": 2, "name": "Sam Bauch", "username": "kenyatta_oconnell", "state": "active", "web_url": "https://gitlab.example.com/kenyatta_oconnell" },
+    "reviewers": [
+      { "id": 1, "name": "Administrator", "username": "root", "state": "active", "web_url": "https://gitlab.example.com/root" }
+    ],
+    "source_project_id": 3,
+    "target_project_id": 3,
+    "draft": false,
+    "work_in_progress": false,
+    "sha": "33e2ee8579fda5bc36accc9c6fbd0b4fefda9e30",
+    "web_url": "https://gitlab.example.com/my-group/sub/my-project/-/merge_requests/10",
+    "references": { "short": "!10", "relative": "!10", "full": "my-group/sub/my-project!10" }
+  },
+  {
+    "id": 102,
+    "iid": 11,
+    "project_id": 3,
+    "title": "Fix typo from a fork",
+    "state": "opened",
+    "created_at": "2026-11-08T08:00:00.000Z",
+    "updated_at": "2026-11-09T10:00:00.000Z",
+    "target_branch": "main",
+    "source_branch": "typo",
+    "user_notes_count": 0,
+    "author": { "bot": false, "id": 5, "name": "Casey Contributor", "username": "contrib", "state": "active" },
+    "reviewers": [],
+    "source_project_id": 9,
+    "target_project_id": 3,
+    "draft": false,
+    "sha": "1111111111111111111111111111111111111111",
+    "web_url": "https://gitlab.example.com/my-group/sub/my-project/-/merge_requests/11"
+  },
+  {
+    "id": 103,
+    "iid": 12,
+    "project_id": 3,
+    "title": "Draft: my own refactor",
+    "state": "opened",
+    "created_at": "2026-11-07T08:00:00.000Z",
+    "updated_at": "2026-11-08T10:00:00.000Z",
+    "target_branch": "main",
+    "source_branch": "refactor",
+    "user_notes_count": 1,
+    "author": { "bot": false, "id": 1, "name": "Administrator", "username": "root", "state": "active" },
+    "reviewers": [
+      { "id": 2, "name": "Sam Bauch", "username": "kenyatta_oconnell", "state": "active" }
+    ],
+    "source_project_id": 3,
+    "target_project_id": 3,
+    "draft": true,
+    "work_in_progress": true,
+    "sha": "2222222222222222222222222222222222222222",
+    "web_url": "https://gitlab.example.com/my-group/sub/my-project/-/merge_requests/12"
+  },
+  {
+    "id": 104,
+    "iid": 13,
+    "project_id": 3,
+    "title": "Bump the parser",
+    "state": "opened",
+    "created_at": "2026-11-06T08:00:00.000Z",
+    "updated_at": "2026-11-07T10:00:00.000Z",
+    "target_branch": "main",
+    "source_branch": "bump-parser",
+    "user_notes_count": 2,
+    "author": { "bot": true, "id": 8, "name": "Renovate Bot", "username": "project_3_bot_5f2a", "state": "active" },
+    "reviewers": [
+      { "id": 1, "name": "Administrator", "username": "root", "state": "active" }
+    ],
+    "source_project_id": 3,
+    "target_project_id": 3,
+    "draft": false,
+    "sha": "3333333333333333333333333333333333333333",
+    "web_url": "https://gitlab.example.com/my-group/sub/my-project/-/merge_requests/13"
+  },
+  {
+    "id": 105,
+    "iid": 14,
+    "project_id": 3,
+    "state": "opened",
+    "created_at": "2026-11-05T08:00:00.000Z",
+    "updated_at": "2026-11-06T10:00:00.000Z",
+    "target_branch": "main",
+    "source_branch": "broken",
+    "author": { "id": 2, "name": "Sam Bauch", "username": "kenyatta_oconnell" },
+    "source_project_id": 3,
+    "target_project_id": 3
+  }
+]

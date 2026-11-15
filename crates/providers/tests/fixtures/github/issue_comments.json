@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "node_id": "MDEyOklzc3VlQ29tbWVudDE=",
+    "url": "https://api.github.com/repos/octo-org/api/issues/comments/1",
+    "html_url": "https://github.com/octo-org/api/issues/1347#issuecomment-1",
+    "body": "Me too",
+    "user": {"login": "octocat", "id": 1, "type": "User", "site_admin": false},
+    "created_at": "2011-04-14T16:00:49Z",
+    "updated_at": "2011-04-14T16:00:49Z",
+    "author_association": "COLLABORATOR",
+    "performed_via_github_app": null
+  },
+  {
+    "id": 2,
+    "node_id": "MDEyOklzc3VlQ29tbWVudDI=",
+    "url": "https://api.github.com/repos/octo-org/api/issues/comments/2",
+    "html_url": "https://github.com/octo-org/api/issues/1347#issuecomment-2",
+    "body": "Build passed.",
+    "user": {"login": "github-actions[bot]", "id": 41898282, "type": "Bot", "site_admin": false},
+    "created_at": "2011-04-14T16:05:49Z",
+    "updated_at": "2011-04-14T16:05:49Z",
+    "author_association": "NONE",
+    "performed_via_github_app": {"slug": "github-actions", "name": "GitHub Actions"}
+  }
+]

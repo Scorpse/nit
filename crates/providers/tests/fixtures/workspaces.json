@@ -1,0 +1,3 @@
+{"pagelen":50,"page":1,"size":2,"values":[
+{"type":"workspace_access","permission":"member","last_accessed":"2026-01-02T03:04:05.000000+00:00","added_on":"2020-01-01T00:00:00.000000+00:00","workspace":{"type":"workspace","uuid":"{w1}","name":"Acme Inc","slug":"acme"}},
+{"type":"workspace_access","permission":"owner","workspace":{"type":"workspace","uuid":"{w2}","name":"Side Project","slug":"side-project"}}]}

@@ -1,0 +1,11 @@
+[
+  {
+    "id": 3,
+    "name": "My Project",
+    "path": "my-project",
+    "path_with_namespace": "my-group/sub/my-project",
+    "namespace": { "id": 7, "full_path": "my-group/sub" },
+    "web_url": "https://gitlab.example.com/my-group/sub/my-project",
+    "visibility": "private"
+  }
+]

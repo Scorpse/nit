@@ -1,0 +1,19 @@
+{
+  "data": {
+    "repository": {
+      "pullRequest": {
+        "reviews": {
+          "pageInfo": {"hasNextPage": false, "endCursor": null},
+          "nodes": [
+            {"id": "PRR_kwDOAr80", "databaseId": 80, "state": "APPROVED", "body": "Here is the body for the review.",
+             "submittedAt": "2019-11-17T17:43:43Z", "updatedAt": "2019-11-17T17:43:43Z",
+             "author": {"__typename": "User", "login": "octocat", "databaseId": 1, "name": "monalisa octocat"}},
+            {"id": "PRR_kwDOAr81", "databaseId": 81, "state": "COMMENTED", "body": "",
+             "submittedAt": "2019-11-17T18:43:43Z", "updatedAt": "2019-11-17T18:43:43Z",
+             "author": {"__typename": "User", "login": "hubot", "databaseId": 2, "name": "Hubot"}}
+          ]
+        }
+      }
+    }
+  }
+}

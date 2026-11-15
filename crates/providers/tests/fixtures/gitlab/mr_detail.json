@@ -1,0 +1,28 @@
+{
+  "id": 101,
+  "iid": 10,
+  "project_id": 3,
+  "title": "Add widgets",
+  "state": "opened",
+  "created_at": "2026-11-09T08:00:00.000Z",
+  "updated_at": "2026-11-10T10:00:00.000Z",
+  "target_branch": "main",
+  "source_branch": "feature/widgets",
+  "user_notes_count": 3,
+  "author": { "bot": false, "id": 2, "name": "Sam Bauch", "username": "kenyatta_oconnell", "state": "active" },
+  "reviewers": [
+    { "id": 1, "name": "Administrator", "username": "root", "state": "active" }
+  ],
+  "source_project_id": 3,
+  "target_project_id": 3,
+  "draft": false,
+  "sha": "33e2ee8579fda5bc36accc9c6fbd0b4fefda9e30",
+  "web_url": "https://gitlab.example.com/my-group/sub/my-project/-/merge_requests/10",
+  "changes_count": "5",
+  "diff_refs": {
+    "base_sha": "eeb57dffe83deb686a60a71c16c32f71046868fd",
+    "head_sha": "33e2ee8579fda5bc36accc9c6fbd0b4fefda9e30",
+    "start_sha": "eeb57dffe83deb686a60a71c16c32f71046868fd"
+  },
+  "user": { "can_merge": true }
+}

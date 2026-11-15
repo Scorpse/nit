@@ -1,0 +1,16 @@
+{
+  "data": {
+    "node": {
+      "comments": {
+        "pageInfo": {"hasNextPage": false, "endCursor": "Y3Vyc29yOnYyOpI="},
+        "nodes": [
+          {"id": "PRRC_kwDOAc107", "databaseId": 107, "body": "Second page reply.",
+           "createdAt": "2011-04-14T20:10:49Z", "updatedAt": "2011-04-14T20:10:49Z",
+           "outdated": false, "commit": {"oid": "6dcb09b5b57875f334f61aebed695e2e4193db5e"},
+           "originalCommit": {"oid": "6dcb09b5b57875f334f61aebed695e2e4193db5e"},
+           "author": {"__typename": "Bot", "login": "github-actions", "databaseId": 41898282}}
+        ]
+      }
+    }
+  }
+}
