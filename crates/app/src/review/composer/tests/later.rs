@@ -38,7 +38,7 @@ fn stale_disables_inline_submit_only() {
     assert!(c.confirm.is_none());
 }
 
-/// A composer as the app builds it without NIT_INLINE_EXPERIMENT: inline posting off.
+/// A composer with inline posting forced off, to test the refusal path.
 fn composer_inline_off(store: Arc<Mutex<Store>>, poster: &Arc<MemoryPoster>) -> Composer {
     let mut c = composer(store, poster);
     c.inline_enabled = false;
@@ -136,52 +136,28 @@ fn inline_enabled_posts_inline_drafts() {
 }
 
 #[test]
-fn inline_is_off_unless_the_experiment_flag_is_set() {
-    // NIT_INLINE_EXPERIMENT is not set for the test run
-    assert!(std::env::var_os("NIT_INLINE_EXPERIMENT").is_none());
-    assert!(!inline_posting_enabled());
+fn bitbucket_inline_is_on() {
+    assert!(inline_posting_enabled_for(Forge::BitbucketCloud));
     let c = Composer::new(repo(), 7, mem_store());
-    assert!(!c.inline_enabled);
+    assert!(c.inline_enabled());
 }
 
 #[test]
-fn github_inline_is_gated_by_its_own_const_not_the_bitbucket_flag() {
+fn every_forge_has_its_own_inline_gate() {
     let mut c = Composer::new(repo(), 7, mem_store());
-    // the Bitbucket gate is off in tests; GitHub follows only its own const
-    assert!(!inline_posting_enabled());
-    c.set_forge(Forge::GitHub);
-    assert_eq!(c.inline_enabled(), providers::github::INLINE_ENABLED_GITHUB);
-    assert!(c.inline_enabled());
-    write(&mut c, inline("a.rs", Side::New, 11), "inline");
-    // posted inline, not held
-    assert_eq!(c.refused_inline(), 0);
-    assert_eq!(c.postable().len(), 1);
-    // and Bitbucket stays held
-    c.set_forge(Forge::BitbucketCloud);
-    assert_eq!(c.inline_enabled(), inline_posting_enabled());
-    assert!(!c.inline_enabled());
+    for f in [Forge::BitbucketCloud, Forge::GitHub, Forge::GitLab] {
+        c.set_forge(f);
+        assert_eq!(c.inline_enabled(), inline_posting_enabled_for(f), "{f:?}");
+        assert!(c.inline_enabled(), "{f:?}");
+        write(&mut c, inline("a.rs", Side::New, 11), "inline");
+        assert_eq!(c.refused_inline(), 0, "{f:?}");
+    }
 }
 
-/// GitLab has its own gate too; the Bitbucket experiment flag (off in tests) does not
-/// decide it.
-#[test]
-fn gitlab_inline_is_gated_by_its_own_const() {
-    let mut c = Composer::new(repo(), 7, mem_store());
-    assert!(!inline_posting_enabled());
-    c.set_forge(Forge::GitLab);
-    assert_eq!(c.inline_enabled(), providers::gitlab::INLINE_ENABLED_GITLAB);
-    assert!(c.inline_enabled());
-    write(&mut c, inline("a.rs", Side::New, 11), "inline");
-    assert_eq!(c.refused_inline(), 0);
-    assert_eq!(c.postable().len(), 1);
-}
-
-/// The "experimental" badge names the Bitbucket environment variable only for
-/// Bitbucket; the read-only tooltip names no forge.
+/// No badge text names an environment variable or a forge: the read-only tooltip names none.
 #[test]
 fn badge_texts_fit_every_forge() {
-    assert!(inline_experiment_tip(Forge::BitbucketCloud).contains(INLINE_EXPERIMENT_VAR));
-    for f in [Forge::GitHub, Forge::GitLab] {
+    for f in [Forge::BitbucketCloud, Forge::GitHub, Forge::GitLab] {
         assert!(!inline_experiment_tip(f).contains("NIT_"), "{f:?}");
     }
     for name in ["GitHub", "GitLab", "Bitbucket"] {

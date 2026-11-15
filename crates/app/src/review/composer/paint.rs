@@ -394,19 +394,9 @@ pub fn thread_buttons(ui: &mut Ui, card: Rect, t: &Thread, c: &Composer, acts: &
 /// Forge-neutral: which forges are read-only is `Capabilities::read_only`'s call.
 pub const READ_ONLY_TIP: &str = "read-only for this forge in this version: nothing is posted";
 
-/// The tooltip of the "experimental" badge next to Submit while inline posting is on. Only
-/// Bitbucket's switch is the environment variable; other forges have their own gate.
-pub fn inline_experiment_tip(forge: Forge) -> &'static str {
-    match forge {
-        Forge::BitbucketCloud => {
-            "NIT_INLINE_EXPERIMENT=1: inline comments are enabled for the anchoring \
-             experiment; placement is not verified."
-        }
-        Forge::GitHub | Forge::GitLab => {
-            "Inline comments on this forge are new: check where each one lands in the \
-             browser after posting."
-        }
-    }
+/// The tooltip of the "experimental" badge next to Submit while inline posting is on.
+pub fn inline_experiment_tip(_forge: Forge) -> &'static str {
+    "Inline comments are new: check where each one lands in the browser after posting."
 }
 
 /// A disabled "Read-only" button whose tooltip says why (in place of the write buttons).
@@ -597,13 +587,6 @@ pub fn confirm_dialog(ctx: &egui::Context, c: &Composer, acts: &mut Vec<Act>) {
                         ui.label(RichText::new(describe(d)).monospace());
                         ui.label(RichText::new(preview(&d.text)).color(QUIET));
                     });
-                    if d.kind == DraftKind::Inline && !INLINE_VERIFIED && c.forge != Forge::GitHub {
-                        ui.label(
-                            RichText::new(INLINE_UNVERIFIED_NOTE)
-                                .color(AMBER)
-                                .size(12.0),
-                        );
-                    }
                     ui.add_space(2.0);
                 }
             });

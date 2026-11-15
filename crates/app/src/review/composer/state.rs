@@ -132,7 +132,7 @@ pub struct Composer {
     pub head: String,
     /// The PR moved since it was fetched: inline drafts are held.
     pub stale: bool,
-    /// Inline drafts may be posted (see `inline_posting_enabled`); else they stay saved.
+    /// Inline drafts may be posted (see `inline_posting_enabled_for`); else they stay saved.
     pub(super) inline_enabled: bool,
     pub(super) poster: Option<Poster>,
     pub(super) rows: Option<RowSource>,
@@ -202,7 +202,7 @@ impl Composer {
             store,
             head: String::new(),
             stale: false,
-            inline_enabled: inline_posting_enabled(),
+            inline_enabled: INLINE_ENABLED_BITBUCKET,
             poster: None,
             read_only: false,
             forge: Forge::BitbucketCloud,

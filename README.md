@@ -61,7 +61,7 @@ On Linux:
 | Inbox, sizes, stacks, Needs me | yes | yes | yes |
 | Review screen (local diff, Viewed marks) | yes | yes | yes |
 | PR-level and file comments, replies | yes | yes | yes |
-| Inline comments | disabled until verified | yes, single and multi-line | yes, single and multi-line |
+| Inline comments | yes, single line | yes, single and multi-line | yes, single and multi-line |
 | Resolve / unresolve threads | yes | yes | yes |
 | Approve / request changes | yes | yes | yes |
 | Fork PRs | not supported | yes | yes |

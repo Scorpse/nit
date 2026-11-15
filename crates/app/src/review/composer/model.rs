@@ -3,31 +3,20 @@
 use super::*;
 use crate::theme::{AMBER, RED};
 
-/// Flip to true (here only) once the owner's anchoring experiment showed that inline
-/// comments land on the intended line in Bitbucket. While false, inline drafts cannot be
-/// posted (they stay saved); `NIT_INLINE_EXPERIMENT=1` lifts that for the experiment only.
-pub const INLINE_VERIFIED: bool = false;
+/// Bitbucket inline posting. Verified live against a real pull request: a comment with
+/// `inline.to` lands on that line of the new file (added and context lines), one with
+/// `inline.from` on that line of the old file (deleted lines), and Bitbucket echoes the same
+/// anchor back. Bitbucket has no multi-line comments, so ranges are refused by the provider.
+pub const INLINE_ENABLED_BITBUCKET: bool = true;
 
-/// Environment variable that enables inline posting for the anchoring experiment.
-pub const INLINE_EXPERIMENT_VAR: &str = "NIT_INLINE_EXPERIMENT";
-
-/// Whether inline drafts may be posted: verified, or the experiment flag is set to `1`.
-/// Read once per process.
-pub fn inline_posting_enabled() -> bool {
-    pub(super) static ON: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
-    *ON.get_or_init(|| {
-        INLINE_VERIFIED || std::env::var(INLINE_EXPERIMENT_VAR).is_ok_and(|v| v == "1")
-    })
-}
-
-/// Whether inline drafts may be posted on `forge`. GitHub and GitLab have their own
-/// compile-time gates (`INLINE_ENABLED_GITHUB`, `INLINE_ENABLED_GITLAB`, flipped only by the
-/// owner after each forge's anchoring findings); the Bitbucket experiment flag lifts neither.
+/// Whether inline drafts may be posted on `forge`: each forge has its own compile-time gate
+/// (`INLINE_ENABLED_BITBUCKET`, `INLINE_ENABLED_GITHUB`, `INLINE_ENABLED_GITLAB`), flipped
+/// only after that forge's anchoring was verified.
 pub fn inline_posting_enabled_for(forge: Forge) -> bool {
     match forge {
         Forge::GitHub => providers::github::INLINE_ENABLED_GITHUB,
         Forge::GitLab => providers::gitlab::INLINE_ENABLED_GITLAB,
-        Forge::BitbucketCloud => inline_posting_enabled(),
+        Forge::BitbucketCloud => INLINE_ENABLED_BITBUCKET,
     }
 }
 
@@ -39,10 +28,6 @@ pub(super) fn inline_disabled_message(n: usize) -> String {
          comment instead\" on a draft to post it another way."
     )
 }
-
-/// Shown next to every inline draft in the submit dialog while `INLINE_VERIFIED` is false.
-pub const INLINE_UNVERIFIED_NOTE: &str =
-    "Inline placement is not verified yet: check the line on Bitbucket after posting.";
 
 /// How long the resolve / unresolve toast offers Undo.
 pub const UNDO_FOR: Duration = Duration::from_secs(5);
