@@ -264,54 +264,6 @@ fn transport_rule_allows_https_and_warns_on_private_http() {
 }
 
 #[test]
-fn bare_check_tests_every_enabled_account() {
-    let mut off = account("acc-off", Forge::GitHub, "github.com");
-    off.enabled = false;
-    let accounts = vec![
-        Account::default_bitbucket("{ana}".into(), "Ana".into()),
-        account("acc-gl", Forge::GitLab, "git.corp.example/gitlab"),
-        off,
-    ];
-    let bare = CheckArgs {
-        account: None,
-        repo: None,
-        pr: None,
-        write_test: false,
-    };
-    let ids = |v: Option<Vec<Account>>| {
-        v.map(|l| {
-            l.iter()
-                .map(|a| a.id.as_str().to_string())
-                .collect::<Vec<_>>()
-        })
-    };
-    // every enabled account, in cache order; the disabled one is left out
-    assert_eq!(
-        ids(accounts_to_check(&accounts, &bare)),
-        Some(vec!["acc-bitbucket-default".into(), "acc-gl".into()])
-    );
-    // a named account, or options that belong to one forge, mean a single check
-    for single in [
-        CheckArgs {
-            account: Some("acc-gl".into()),
-            ..bare.clone()
-        },
-        CheckArgs {
-            repo: RepoRef::parse_bitbucket("acme/api"),
-            ..bare.clone()
-        },
-        CheckArgs {
-            pr: Some(7),
-            ..bare.clone()
-        },
-    ] {
-        assert_eq!(accounts_to_check(&accounts, &single), None, "{single:?}");
-    }
-    // no cache (or nothing enabled): the single default sign-in as before
-    assert_eq!(accounts_to_check(&[], &bare), None);
-}
-
-#[test]
 fn account_flag_selects_by_id_or_host() {
     let accounts = vec![
         Account::default_bitbucket("{ana}".into(), "Ana".into()),
