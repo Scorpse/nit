@@ -27,7 +27,7 @@ use super::comments_ui::{
     is_flagged, is_open, measure_with, outdated_note, paint_card, reason_note, scope, title_rect,
     CardLayout, CardToggle, Comments, Scope, CARD_MARGIN,
 };
-use super::commits_ui::Commits;
+use super::commits_ui::{Commits, Want};
 use super::composer::{
     confirm_dialog, draft_card, draft_height, draft_widget, drafts_bar, editor_card, editor_height,
     editor_widget, reply_widgets, thread_buttons, toast, Act, Composer, MemoryPoster, Poster, Slot,

@@ -2095,3 +2095,71 @@ fn a_failing_last_review_read_does_not_fail_the_open() {
     assert!(!failed(&evs));
     assert!(evs.iter().any(|e| matches!(e, ReviewEvent::Commits(_))));
 }
+
+#[test]
+fn a_commit_range_lists_its_files_and_builds_a_patch() {
+    let f = review_fixture();
+    let svc = local(&f);
+    open_and_wait(&svc, &f);
+    let range = crate::review::commits_ui::commit_range(&prcore::history::CommitInfo {
+        id: f.head.clone(),
+        author: String::new(),
+        date: chrono::Utc::now(),
+        subject: String::new(),
+    });
+    svc.request_range_files(range.clone());
+    let evs = collect_until(&svc, |e| {
+        e.iter()
+            .any(|x| matches!(x, ReviewEvent::RangeFiles { .. }))
+    });
+    let files = evs
+        .iter()
+        .find_map(|e| match e {
+            ReviewEvent::RangeFiles { range: r, result } if *r == range => result.clone().ok(),
+            _ => None,
+        })
+        .expect("the commit's files");
+    assert!(!files.is_empty());
+    let modified = files
+        .iter()
+        .find(|d| d.status == FileStatus::Modified && !d.binary)
+        .expect("a modified text file")
+        .clone();
+    svc.request_range_patch(range.clone(), modified.clone());
+    let evs = collect_until(&svc, |e| {
+        e.iter()
+            .any(|x| matches!(x, ReviewEvent::RangePatch { .. }))
+    });
+    let text = evs
+        .iter()
+        .find_map(|e| match e {
+            ReviewEvent::RangePatch { path, result, .. } if *path == modified.path => {
+                result.clone().ok()
+            }
+            _ => None,
+        })
+        .expect("the patch");
+    assert!(
+        text.contains("@@") && text.lines().any(|l| l.starts_with('+')),
+        "{text}"
+    );
+}
+
+#[test]
+fn a_bad_range_is_an_error_not_a_crash() {
+    let f = review_fixture();
+    let svc = local(&f);
+    open_and_wait(&svc, &f);
+    let range = CommitRange {
+        base: "--all".into(),
+        head: f.head.clone(),
+    };
+    svc.request_range_files(range.clone());
+    let evs = collect_until(&svc, |e| {
+        e.iter()
+            .any(|x| matches!(x, ReviewEvent::RangeFiles { .. }))
+    });
+    assert!(evs
+        .iter()
+        .any(|e| matches!(e, ReviewEvent::RangeFiles { result: Err(_), .. })));
+}

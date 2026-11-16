@@ -15,9 +15,9 @@ use std::time::{Duration, Instant};
 
 use eframe::egui;
 use gitlocal::{
-    batch_patches_cancellable, commit_log, discover_clones, fetch_pr, file_counts, file_list,
-    file_patch, find_clone, needs_clone, pick_local, ref_prefix, resolve_commits, FetchSpec, Git,
-    GitAuth, GitError, GitProgress, LocalClone, LocalRepo, PrRefs, RepoKind,
+    batch_patches_cancellable, commit_log, discover_clones, fetch_pr, file_counts, file_index,
+    file_list, file_patch, find_clone, needs_clone, pick_local, ref_prefix, resolve_commits,
+    FetchSpec, Git, GitAuth, GitError, GitProgress, LocalClone, LocalRepo, PrRefs, RepoKind,
 };
 use prcore::comments::{build_threads, Thread};
 use prcore::commit::same_commit_or_unknown;

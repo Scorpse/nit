@@ -70,6 +70,7 @@ impl ReviewScreen {
                 let t = self.timings.since_start();
                 self.timings.file_list.get_or_insert(t);
                 self.composer.head = refs.head.clone();
+                self.commits.pr_base = refs.base.clone();
                 self.composer.revalidate_heads();
                 // after a reload the inbox head is unknown: the fetched head is what is shown
                 if self.pr.source_commit.is_empty() {
@@ -168,6 +169,12 @@ impl ReviewScreen {
                 self.save_caught_up();
             }
             ReviewEvent::LastReviewFailed(e) => self.commits.fail_mark(e),
+            ReviewEvent::RangeFiles { range, result } => self.commits.set_files(range, result),
+            ReviewEvent::RangePatch {
+                range,
+                path,
+                result,
+            } => self.commits.set_patch(range, path, result),
         }
     }
 

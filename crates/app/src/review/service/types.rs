@@ -85,6 +85,14 @@ pub(super) fn fixed_deps(
     Arc::new(move |_: &RepoRef| deps.clone())
 }
 
+/// What changed from commit `base` to commit `head` of the open PR (`<id>^` is the parent of
+/// a single commit).
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct CommitRange {
+    pub base: String,
+    pub head: String,
+}
+
 #[derive(Clone, Debug)]
 pub enum ReviewEvent {
     /// Progress text, e.g. "Fetching branches...".
@@ -137,6 +145,17 @@ pub enum ReviewEvent {
     LastReview(Option<ReviewMark>),
     /// My last review could not be read; the commits are still shown, none marked new.
     LastReviewFailed(String),
+    /// The files changed in a commit range, with their line counts.
+    RangeFiles {
+        range: CommitRange,
+        result: Result<Vec<DiffFile>, String>,
+    },
+    /// One file's patch (git's unified diff) in a commit range.
+    RangePatch {
+        range: CommitRange,
+        path: String,
+        result: Result<Arc<String>, String>,
+    },
 }
 
 /// `https://<host>/<namespace>/<slug>.git` on the repository's own host (`bitbucket.org`,

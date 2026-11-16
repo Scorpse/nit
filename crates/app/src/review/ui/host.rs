@@ -79,6 +79,11 @@ impl ReviewHost {
     /// Screenshots and `--bench-review`: the selected diff is on screen and its colours arrived.
     pub fn ready_highlighted(&self) -> bool {
         self.ready_for_shot()
+            && (!self.shot_commits
+                || self
+                    .screen
+                    .as_ref()
+                    .is_some_and(|s| s.commits.patch.is_some()))
             && self
                 .screen
                 .as_ref()
@@ -302,6 +307,25 @@ impl ReviewHost {
     }
 }
 
+/// Commits scene: chooses the newest commit and its first file as soon as each is known.
+fn shot_commits_step(s: &mut ReviewScreen) {
+    let c = &mut s.commits;
+    if c.selected.is_none() {
+        if let Some(last) = c.list.as_ref().and_then(|l| l.last()) {
+            c.select(super::super::commits_ui::commit_range(last));
+        }
+        return;
+    }
+    if c.open_file.is_none() {
+        let range = c.selected.clone().unwrap_or_else(|| unreachable!());
+        if let Some(Ok(files)) = c.files.get(&range) {
+            if let Some(f) = files.first().cloned() {
+                c.open(&f);
+            }
+        }
+    }
+}
+
 /// Drafts scene: the draft on a line outside the diff shows as blocked, and a composer is
 /// open on a line of the commented file.
 pub(super) fn shot_drafts_setup(c: &mut Composer) {
@@ -372,9 +396,13 @@ pub fn show(host: &mut ReviewHost, root: &mut Ui, backend: Option<&Backend>) -> 
     if host.shot_scene && counted {
         host.shot_setup();
     }
+    let shot_commits = host.shot_commits;
     let Some(screen) = host.screen.as_mut() else {
         return true;
     };
+    if shot_commits {
+        shot_commits_step(screen);
+    }
     screen.poll_composer();
     screen.poll_writes(&ctx);
     // the PR may be pushed to while it is open: ask again on focus and once a minute
@@ -501,6 +529,12 @@ pub fn show(host: &mut ReviewHost, root: &mut Ui, backend: Option<&Backend>) -> 
     if let Some(svc) = &host.service {
         for path in screen.take_requests() {
             svc.request_patch(path, true);
+        }
+        for want in screen.commits.take_wants() {
+            match want {
+                Want::Files(range) => svc.request_range_files(range),
+                Want::Patch(range, file) => svc.request_range_patch(range, file),
+            }
         }
         // where the diff is scrolled: its colours start there
         if let Some(v) = screen.take_visible_change() {

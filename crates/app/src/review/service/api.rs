@@ -226,6 +226,30 @@ impl ReviewService {
         self.shared.work.notify_all();
     }
 
+    /// Lists the files changed in `range` (answered by `RangeFiles`).
+    pub fn request_range_files(&self, range: CommitRange) {
+        let (gen, sess) = {
+            let st = self.shared.lock();
+            match &st.session {
+                Some(sess) => (st.gen, sess.clone()),
+                None => return,
+            }
+        };
+        spawn_range_files(&self.shared, gen, sess, range);
+    }
+
+    /// Builds `file`'s patch in `range` (answered by `RangePatch`).
+    pub fn request_range_patch(&self, range: CommitRange, file: DiffFile) {
+        let (gen, sess) = {
+            let st = self.shared.lock();
+            match &st.session {
+                Some(sess) => (st.gen, sess.clone()),
+                None => return,
+            }
+        };
+        spawn_range_patch(&self.shared, gen, sess, range, file);
+    }
+
     /// The file on screen and its first visible row; a highlight of that file starts at
     /// that row's hunk. Cheap (one small mutex, not the state lock): call it every frame.
     pub fn set_visible(&self, path: &str, first_row: usize) {

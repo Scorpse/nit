@@ -27,6 +27,6 @@ mod worddiff;
 pub use cache::{PatchCache, PATCH_CACHE_BYTES};
 #[allow(unused_imports)]
 pub use service::{
-    remember_clones, CommentFetcher, DepsFn, HeadProbe, LastReviewFetcher, ReviewDeps, ReviewEvent,
-    ReviewService, PLAIN_CHANGED_LINES, PREFETCH_RADIUS,
+    remember_clones, CommentFetcher, CommitRange, DepsFn, HeadProbe, LastReviewFetcher, ReviewDeps,
+    ReviewEvent, ReviewService, PLAIN_CHANGED_LINES, PREFETCH_RADIUS,
 };

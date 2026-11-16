@@ -1,5 +1,6 @@
 use super::*;
 use chrono::{TimeZone, Utc};
+use prcore::diff::DiffFile;
 
 fn commit(id: char, hour: u32) -> CommitInfo {
     CommitInfo {
@@ -83,4 +84,82 @@ fn a_failed_review_read_says_so_and_marks_nothing() {
     assert!(c.note().unwrap().contains("network error"));
     c.set_mark(Some(mark(7)));
     assert_eq!(c.new_flags(), [true], "a later answer replaces the failure");
+}
+
+fn file(path: &str) -> DiffFile {
+    DiffFile {
+        path: path.into(),
+        old_path: None,
+        status: prcore::diff::FileStatus::Modified,
+        additions: 2,
+        deletions: 1,
+        binary: false,
+        counts_known: true,
+        new_oid: String::new(),
+    }
+}
+
+#[test]
+fn choosing_a_commit_asks_for_its_files_once() {
+    let mut c = Commits::default();
+    let r = commit_range(&commit('a', 8));
+    assert_eq!(r.base, format!("{}^", "a".repeat(40)));
+    c.select(r.clone());
+    c.select(r.clone());
+    assert_eq!(
+        c.take_wants(),
+        [Want::Files(r.clone())],
+        "the same choice asks once"
+    );
+    c.set_files(r.clone(), Ok(vec![file("a.rs")]));
+    let other = commit_range(&commit('b', 9));
+    c.select(other);
+    c.take_wants();
+    c.select(r.clone());
+    assert!(
+        c.take_wants().is_empty(),
+        "files already known are not asked again"
+    );
+}
+
+#[test]
+fn a_patch_for_a_file_no_longer_open_is_dropped_and_a_long_one_is_cut() {
+    let mut c = Commits::default();
+    let r = commit_range(&commit('a', 8));
+    c.select(r.clone());
+    c.open(&file("a.rs"));
+    c.take_wants();
+    c.set_patch(r.clone(), "b.rs".into(), Ok(Arc::new("+x\n".into())));
+    assert!(c.patch.is_none(), "another file's answer");
+    let long = "+x\n".repeat(MAX_PATCH_LINES + 5);
+    c.set_patch(r.clone(), "a.rs".into(), Ok(Arc::new(long)));
+    let p = c.patch.as_ref().unwrap();
+    assert_eq!(p.lines.as_ref().unwrap().len(), MAX_PATCH_LINES);
+    assert!(p.cut);
+    c.select(commit_range(&commit('b', 9)));
+    assert!(
+        c.patch.is_none() && c.open_file.is_none(),
+        "a new choice clears the file"
+    );
+}
+
+#[test]
+fn all_the_new_commits_are_one_range_from_where_i_was_caught_up() {
+    let mut c = Commits {
+        pr_base: "base".into(),
+        ..Commits::default()
+    };
+    c.set_list(vec![commit('a', 8), commit('b', 10), commit('c', 11)]);
+    assert_eq!(c.since_review(), None, "no review known");
+    c.set_mark(Some(mark(9)));
+    let r = c.since_review().unwrap();
+    assert_eq!((r.base, r.head), (commit('a', 8).id, commit('c', 11).id));
+    c.set_mark(Some(mark(7)));
+    assert_eq!(
+        c.since_review().unwrap().base,
+        "base",
+        "everything is new: from the PR's base"
+    );
+    c.set_mark(Some(mark(12)));
+    assert_eq!(c.since_review(), None, "nothing new");
 }
