@@ -9,6 +9,7 @@
   {"type":"participant","user":{"uuid":"{cccc}","display_name":"Carol Changes"},"role":"REVIEWER","approved":false,"state":"changes_requested"},
   {"type":"participant","user":{"uuid":"{dddd}","display_name":"Dan Pending"},"role":"REVIEWER","approved":false,"state":null},
   {"type":"participant","user":{"uuid":"{eeee}","display_name":"Eve Approved Flag"},"role":"REVIEWER","approved":true},
+  {"type":"participant","user":{"uuid":"{gggg}","display_name":"Grace Unlisted Approver"},"role":"PARTICIPANT","approved":true,"state":"approved"},
   {"type":"participant","user":{"uuid":"{ffff}","display_name":"Frank Commenter"},"role":"PARTICIPANT","approved":false,"state":null}],
  "created_on":"2026-03-01T10:00:00.000000+00:00","updated_on":"2026-03-02T11:30:15.250000+00:00"},
 {"type":"pullrequest","id":43,"title":"WIP: refactor","state":"OPEN","draft":true,

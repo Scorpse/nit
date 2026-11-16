@@ -8,6 +8,7 @@ While the version is below 1.0, minor versions may contain breaking changes.
 
 ## [Unreleased]
 
+- Bitbucket: people who approved or requested changes are shown even when they were never added as reviewers; before, their approval was hidden.
 ## [0.1.2] - 2026-11-16
 
 - Inbox rows show review and build status: changes requested, conflicts, checks failed, running or passed, open tasks and approvals. The detail pane adds Checks and Merge rows. Bitbucket reads build statuses with one extra request per open pull request; Bitbucket has no conflict flag.

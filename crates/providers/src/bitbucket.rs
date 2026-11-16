@@ -507,9 +507,13 @@ impl PrDto {
             .participants
             .unwrap_or_default()
             .into_iter()
-            .filter(|p| p.role.as_deref() == Some("REVIEWER"))
             .filter_map(|p| {
                 let state = review_state(&p);
+                // Anyone who approved or asked for changes counts, even when never added
+                // as a reviewer; other non-reviewers are just participants.
+                if p.role.as_deref() != Some("REVIEWER") && state == ReviewState::Pending {
+                    return None;
+                }
                 p.user.map(|u| Reviewer {
                     user: u.into(),
                     state,
