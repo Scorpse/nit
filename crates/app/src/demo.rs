@@ -219,6 +219,8 @@ fn pr(slug: &str, id: u64, title: &str, author: &UserRef, age_min: i64) -> PullR
         node_id: None,
         review_requested_from_me: false,
         locked: false,
+        checks: Default::default(),
+        has_conflicts: false,
     }
 }
 
@@ -265,7 +267,7 @@ pub fn demo_data() -> (UserRef, Vec<PullRequest>, HashMap<(RepoRef, u64), DiffSt
     // acme/api: a 3-deep stack; the newest ungrouped scenario PRs sort right below it.
     let mut a1 = pr("api", 101, "Add rate limiter core", &ana, 300);
     a1.reviewers = vec![review(&me, ReviewState::Pending)];
-    let a2 = stacked_on(
+    let mut a2 = stacked_on(
         pr("api", 102, "Rate limiter: per-token buckets", &ana, 290),
         &a1,
     );
@@ -273,6 +275,10 @@ pub fn demo_data() -> (UserRef, Vec<PullRequest>, HashMap<(RepoRef, u64), DiffSt
         pr("api", 103, "Rate limiter: expose metrics", &ana, 280),
         &a2,
     );
+    a2.checks = prcore::model::CheckState::Failing;
+    a2.reviewers = vec![review(&chen, ReviewState::ChangesRequested)];
+    a1.checks = prcore::model::CheckState::Passing;
+    a1.has_conflicts = true;
     b.add(a1, stat(6, 220, 14, 120));
     b.add(a2, stat(4, 140, 30, 90));
     b.add(a3, stat(3, 80, 5, 60));

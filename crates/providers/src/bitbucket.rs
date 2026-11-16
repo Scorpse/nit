@@ -8,7 +8,8 @@ use prcore::comments::{
 };
 use prcore::draft::Side;
 use prcore::model::{
-    DiffStat, Forge, PrState, PullRequest, RepoInfo, RepoRef, ReviewState, Reviewer, UserRef,
+    CheckState, DiffStat, Forge, PrState, PullRequest, RepoInfo, RepoRef, ReviewState, Reviewer,
+    UserRef,
 };
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
@@ -545,6 +546,8 @@ impl PrDto {
             node_id: None,
             review_requested_from_me: false,
             locked: false,
+            checks: Default::default(),
+            has_conflicts: false,
         }
     }
 }
@@ -562,7 +565,52 @@ fn with_pr_fields(next: String) -> String {
     format!("{next}{sep}{PR_FIELDS}")
 }
 
+/// Build results fetched at once: enough to keep a big repository's sync quick, few enough
+/// not to trip Bitbucket's rate limit.
+const STATUS_CONCURRENCY: usize = 6;
+
+/// Folds the commit statuses of a PR: any failed or stopped build fails it, else any running
+/// build keeps it running, else any success passes it; no statuses is unknown.
+fn fold_statuses(values: &[Value]) -> CheckState {
+    let mut out = CheckState::Unknown;
+    for s in values {
+        match str_at(s, "state") {
+            Some("FAILED" | "STOPPED") => return CheckState::Failing,
+            Some("INPROGRESS") => out = CheckState::Running,
+            Some("SUCCESSFUL") if out == CheckState::Unknown => out = CheckState::Passing,
+            _ => {}
+        }
+    }
+    out
+}
+
 impl BitbucketProvider {
+    /// Sets `checks` on each PR from its commit statuses. Best effort: a PR whose statuses
+    /// cannot be read keeps `Unknown`, and the list never fails because of it.
+    async fn fill_checks(&self, repo: &RepoRef, prs: &mut [PullRequest]) {
+        use futures_util::stream::{self, StreamExt};
+        let ids: Vec<u64> = prs.iter().map(|p| p.id).collect();
+        let results: Vec<(u64, CheckState)> = stream::iter(ids)
+            .map(|id| async move {
+                let url = format!(
+                    "/repositories/{}/{}/pullrequests/{id}/statuses?pagelen=100",
+                    repo.namespace, repo.slug
+                );
+                match self.client.get_page(&url).await {
+                    Ok((values, _)) => (id, fold_statuses(&values)),
+                    Err(_) => (id, CheckState::Unknown),
+                }
+            })
+            .buffer_unordered(STATUS_CONCURRENCY)
+            .collect()
+            .await;
+        for (id, state) in results {
+            if let Some(p) = prs.iter_mut().find(|p| p.id == id) {
+                p.checks = state;
+            }
+        }
+    }
+
     /// Walks a PR list (`first_page_only` stops after one page), skipping undecodable entries.
     async fn collect_prs(
         &self,
@@ -684,7 +732,11 @@ impl Provider for BitbucketProvider {
         if state == PrState::Merged {
             url.push_str("&sort=-updated_on");
         }
-        self.collect_prs(url, repo, &state, limit, false).await
+        let mut list = self.collect_prs(url, repo, &state, limit, false).await?;
+        if state == PrState::Open {
+            self.fill_checks(repo, &mut list.prs).await;
+        }
+        Ok(list)
     }
 
     async fn merged_by_source_branch(
@@ -875,5 +927,32 @@ impl Provider for BitbucketProvider {
             stat.max_file_lines = stat.max_file_lines.max(a + r);
         }
         Ok(stat)
+    }
+}
+
+#[cfg(test)]
+mod checks_tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn statuses_fold_to_one_state() {
+        let s = |states: &[&str]| -> Vec<Value> {
+            states.iter().map(|s| json!({"state": s})).collect()
+        };
+        assert_eq!(fold_statuses(&[]), CheckState::Unknown);
+        assert_eq!(
+            fold_statuses(&s(&["SUCCESSFUL", "SUCCESSFUL"])),
+            CheckState::Passing
+        );
+        assert_eq!(
+            fold_statuses(&s(&["SUCCESSFUL", "INPROGRESS"])),
+            CheckState::Running
+        );
+        assert_eq!(
+            fold_statuses(&s(&["INPROGRESS", "FAILED"])),
+            CheckState::Failing
+        );
+        assert_eq!(fold_statuses(&s(&["STOPPED"])), CheckState::Failing);
     }
 }

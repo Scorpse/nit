@@ -7,7 +7,9 @@ use eframe::egui::{
     self, text::LayoutJob, vec2, Align2, Color32, FontId, Galley, Painter, Rect, Sense, TextFormat,
     Ui,
 };
-use prcore::model::{DiffStat, Forge, PrState, PullRequest, RepoRef, ReviewState, BB_MAX_FILES};
+use prcore::model::{
+    CheckState, DiffStat, Forge, PrState, PullRequest, RepoRef, ReviewState, BB_MAX_FILES,
+};
 
 use crate::inbox::{Inbox, InboxRow};
 use crate::theme::{AMBER, GREEN, GREY, RED};
@@ -315,6 +317,36 @@ fn size_job(d: &DiffStat, forge: Forge) -> LayoutJob {
     job
 }
 
+/// The status pills of an open PR, in display order: what a reviewer or author must act on
+/// first (changes requested, failed checks, conflicts), then the good news.
+pub fn status_pills(pr: &PullRequest) -> Vec<(String, Color32)> {
+    let count = |s: ReviewState| pr.reviewers.iter().filter(|r| r.state == s).count();
+    let (approved, changes) = (
+        count(ReviewState::Approved),
+        count(ReviewState::ChangesRequested),
+    );
+    let mut out = Vec::new();
+    if changes > 0 {
+        out.push((format!("changes requested {changes}"), RED));
+    }
+    if pr.has_conflicts {
+        out.push(("conflicts".into(), RED));
+    }
+    match pr.checks {
+        CheckState::Failing => out.push(("checks failed".into(), RED)),
+        CheckState::Running => out.push(("checks running".into(), AMBER)),
+        CheckState::Passing => out.push(("checks passed".into(), GREEN)),
+        CheckState::Unknown => {}
+    }
+    if pr.task_count > 0 {
+        out.push((format!("{} open tasks", pr.task_count), AMBER));
+    }
+    if approved > 0 {
+        out.push((format!("approved {approved}"), GREEN));
+    }
+    out
+}
+
 fn pr_row(ui: &mut Ui, row: &InboxRow, depth: u8, selected: bool) -> egui::Response {
     let (rect, resp) = ui.allocate_exact_size(vec2(ui.available_width(), ROW_H), Sense::click());
     let p = ui.painter_at(rect);
@@ -355,6 +387,11 @@ fn pr_row(ui: &mut Ui, row: &InboxRow, depth: u8, selected: bool) -> egui::Respo
             );
             right = r.left();
         }
+    }
+
+    // status pills left of the size badge (they are listed right to left)
+    for (text, color) in status_pills(&row.pr).iter().rev() {
+        right = pill(&p, right - 8.0, cy, text, Color32::BLACK, *color, true);
     }
 
     // Left side, clipped so it can never run into the right side.
@@ -564,6 +601,19 @@ pub fn show_detail(ui: &mut Ui, d: &Detail) {
                         }
                     });
                     ui.end_row();
+                    ui.label(egui::RichText::new("Checks").color(GREY));
+                    match pr.checks {
+                        CheckState::Failing => ui.colored_label(RED, "failed"),
+                        CheckState::Running => ui.colored_label(AMBER, "running"),
+                        CheckState::Passing => ui.colored_label(GREEN, "passed"),
+                        CheckState::Unknown => ui.label("none reported"),
+                    };
+                    ui.end_row();
+                    if pr.has_conflicts {
+                        ui.label(egui::RichText::new("Merge").color(GREY));
+                        ui.colored_label(RED, "conflicts with the target branch");
+                        ui.end_row();
+                    }
                     ui.label(egui::RichText::new("Comments").color(GREY));
                     if pr.forge == Forge::BitbucketCloud {
                         ui.label(format!(

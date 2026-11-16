@@ -62,6 +62,8 @@ fn pr(r: &RepoRef, id: u64, state: PrState) -> PullRequest {
         node_id: None,
         review_requested_from_me: false,
         locked: false,
+        checks: Default::default(),
+        has_conflicts: false,
     }
 }
 

@@ -5,8 +5,8 @@
 use chrono::{DateTime, Utc};
 use prcore::comments::{looks_like_bot_name, UNKNOWN_AUTHOR};
 use prcore::model::{
-    AccountId, DiffStat, Forge, PrState, PullRequest, RepoInfo, RepoRef, ReviewState, Reviewer,
-    UserRef,
+    AccountId, CheckState, DiffStat, Forge, PrState, PullRequest, RepoInfo, RepoRef, ReviewState,
+    Reviewer, UserRef,
 };
 use serde::Deserialize;
 use serde_json::Value;
@@ -100,6 +100,23 @@ fn is_time(v: &Value) -> bool {
     DateTime::<Utc>::deserialize(v).is_ok()
 }
 
+/// The pipeline result: the head pipeline when the answer carries it, else what the merge
+/// status implies (`ci_must_pass`: not green, `ci_still_running`, `mergeable`: green).
+fn checks_of(v: &Value) -> CheckState {
+    match v.get("head_pipeline").and_then(|p| str_at(p, "status")) {
+        Some("success") => return CheckState::Passing,
+        Some("failed" | "canceled") => return CheckState::Failing,
+        Some(_) => return CheckState::Running,
+        None => {}
+    }
+    match str_at(v, "detailed_merge_status") {
+        Some("ci_must_pass") => CheckState::Failing,
+        Some("ci_still_running") => CheckState::Running,
+        Some("mergeable") => CheckState::Passing,
+        _ => CheckState::Unknown,
+    }
+}
+
 /// A merge request (list or single). The size and review state come separately.
 pub(crate) fn mr(v: &Value, repo: &RepoRef) -> Result<PullRequest, SkippedPr> {
     let required: [Required; 6] = [
@@ -179,6 +196,8 @@ pub(crate) fn mr(v: &Value, repo: &RepoRef) -> Result<PullRequest, SkippedPr> {
             .map(|n| n.to_string()),
         review_requested_from_me: false,
         locked,
+        checks: checks_of(v),
+        has_conflicts: v["has_conflicts"].as_bool() == Some(true),
     })
 }
 
@@ -284,5 +303,45 @@ mod tests {
         for s in ["unreviewed", "review_started", "unapproved", "new-word"] {
             assert_eq!(review_state(Some(s)), ReviewState::Pending, "{s}");
         }
+    }
+}
+
+#[cfg(test)]
+mod checks_tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn pipeline_and_merge_status_map_to_checks() {
+        let c = |v: Value| checks_of(&v);
+        assert_eq!(
+            c(json!({"head_pipeline": {"status": "success"}})),
+            CheckState::Passing
+        );
+        assert_eq!(
+            c(json!({"head_pipeline": {"status": "failed"}})),
+            CheckState::Failing
+        );
+        assert_eq!(
+            c(json!({"head_pipeline": {"status": "running"}})),
+            CheckState::Running
+        );
+        assert_eq!(
+            c(json!({"detailed_merge_status": "ci_must_pass"})),
+            CheckState::Failing
+        );
+        assert_eq!(
+            c(json!({"detailed_merge_status": "ci_still_running"})),
+            CheckState::Running
+        );
+        assert_eq!(
+            c(json!({"detailed_merge_status": "mergeable"})),
+            CheckState::Passing
+        );
+        assert_eq!(
+            c(json!({"detailed_merge_status": "not_approved"})),
+            CheckState::Unknown
+        );
+        assert_eq!(c(json!({})), CheckState::Unknown);
     }
 }

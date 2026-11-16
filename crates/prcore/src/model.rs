@@ -201,6 +201,16 @@ pub enum ReviewState {
     Pending,
 }
 
+/// Result of the CI checks (builds, pipelines) on a PR's head commit.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub enum CheckState {
+    #[default]
+    Unknown,
+    Passing,
+    Failing,
+    Running,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Reviewer {
     pub user: UserRef,
@@ -243,6 +253,12 @@ pub struct PullRequest {
     /// GitLab `locked`; display only.
     #[serde(default)]
     pub locked: bool,
+    /// Build/pipeline result of the head commit; `Unknown` when the forge did not say.
+    #[serde(default)]
+    pub checks: CheckState,
+    /// The forge reports the PR cannot merge cleanly (a conflict with the target).
+    #[serde(default)]
+    pub has_conflicts: bool,
 }
 
 impl PullRequest {

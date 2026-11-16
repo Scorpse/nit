@@ -185,3 +185,44 @@ fn double_click_opens_only_when_the_review_button_is_enabled() {
     assert_eq!(row_click(false, Some(Hidden)), RowClick::Select);
     assert_eq!(row_click(true, None), RowClick::Select);
 }
+
+#[test]
+fn status_pills_put_what_needs_action_first_and_say_nothing_when_unknown() {
+    use prcore::model::{Reviewer, UserRef};
+    let (_, mut prs, _) = demo_data();
+    let mut pr = prs.remove(0);
+    pr.reviewers.clear();
+    pr.task_count = 0;
+    pr.has_conflicts = false;
+    pr.checks = CheckState::Unknown;
+    assert!(status_pills(&pr).is_empty());
+
+    let who = |n: &str, state| Reviewer {
+        user: UserRef {
+            id: n.into(),
+            display_name: n.into(),
+            login: None,
+        },
+        state,
+    };
+    pr.reviewers = vec![
+        who("a", ReviewState::Approved),
+        who("b", ReviewState::Approved),
+        who("c", ReviewState::ChangesRequested),
+        who("d", ReviewState::Pending),
+    ];
+    pr.checks = CheckState::Failing;
+    pr.has_conflicts = true;
+    pr.task_count = 2;
+    let words: Vec<String> = status_pills(&pr).into_iter().map(|(t, _)| t).collect();
+    assert_eq!(
+        words,
+        [
+            "changes requested 1",
+            "conflicts",
+            "checks failed",
+            "2 open tasks",
+            "approved 2"
+        ]
+    );
+}

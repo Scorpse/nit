@@ -8,7 +8,8 @@ pub const OPEN_PRS: &str = r#"query($owner: String!, $name: String!, $cursor: St
     pullRequests(states: OPEN, first: 50, after: $cursor, orderBy: {field: UPDATED_AT, direction: DESC}) {
       pageInfo { hasNextPage endCursor }
       nodes {
-        id number title url isDraft locked isCrossRepository createdAt updatedAt
+        id number title url isDraft locked isCrossRepository createdAt updatedAt mergeable
+        commits(last: 1) { nodes { commit { statusCheckRollup { state } } } }
         additions deletions changedFiles
         headRefName headRefOid baseRefName baseRefOid
         headRepository { nameWithOwner }

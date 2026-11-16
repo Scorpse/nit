@@ -47,6 +47,8 @@ fn pr(id: u64, reviewers: Vec<(UserRef, ReviewState)>) -> PullRequest {
         node_id: None,
         review_requested_from_me: false,
         locked: false,
+        checks: Default::default(),
+        has_conflicts: false,
     }
 }
 

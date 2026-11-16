@@ -171,6 +171,8 @@ fn is_fork_true_when_source_repo_differs() {
         node_id: None,
         review_requested_from_me: false,
         locked: false,
+        checks: Default::default(),
+        has_conflicts: false,
     };
     assert!(!pr.is_fork());
     pr.source_repo = repo("someone", "api");

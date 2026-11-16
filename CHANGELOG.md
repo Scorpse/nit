@@ -8,6 +8,7 @@ While the version is below 1.0, minor versions may contain breaking changes.
 
 ## [Unreleased]
 
+- Inbox rows show review and build status: changes requested, conflicts, checks failed, running or passed, open tasks and approvals. The detail pane adds Checks and Merge rows. Bitbucket reads build statuses with one extra request per open pull request; Bitbucket has no conflict flag.
 ## [0.1.1] - 2026-11-16
 
 - Inline comments on Bitbucket can be posted: the anchoring was checked against a real pull request (added and context lines anchor to the new-file line, deleted lines to the old-file line). `NIT_INLINE_EXPERIMENT` is gone. Bitbucket has no multi-line comments.

@@ -35,6 +35,8 @@ fn pr(repo_name: &str, id: u64, src: &str, dst: &str, state: PrState) -> PullReq
         node_id: None,
         review_requested_from_me: false,
         locked: false,
+        checks: Default::default(),
+        has_conflicts: false,
     }
 }
 

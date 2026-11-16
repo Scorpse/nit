@@ -5,7 +5,8 @@
 use chrono::{DateTime, Utc};
 use prcore::comments::{looks_like_bot_name, UNKNOWN_AUTHOR};
 use prcore::model::{
-    AccountId, DiffStat, Forge, PrState, PullRequest, RepoRef, ReviewState, Reviewer, UserRef,
+    AccountId, CheckState, DiffStat, Forge, PrState, PullRequest, RepoRef, ReviewState, Reviewer,
+    UserRef,
 };
 use serde::Deserialize;
 use serde_json::Value;
@@ -157,6 +158,8 @@ fn base_pr(repo: &RepoRef) -> PullRequest {
         node_id: None,
         review_requested_from_me: false,
         locked: false,
+        checks: Default::default(),
+        has_conflicts: false,
     }
 }
 
@@ -197,6 +200,16 @@ pub(crate) fn pr_from_graphql(
     pr.created_on = time_at(v, "createdAt").unwrap_or_default();
     pr.updated_on = time_at(v, "updatedAt").unwrap_or_default();
     pr.web_url = str_at(v, "url").unwrap_or_default().into();
+    pr.has_conflicts = str_at(v, "mergeable") == Some("CONFLICTING");
+    pr.checks = match field(v, "commits.nodes")
+        .and_then(|n| n.get(0))
+        .and_then(|c| str_at(c, "commit.statusCheckRollup.state"))
+    {
+        Some("SUCCESS") => CheckState::Passing,
+        Some("FAILURE" | "ERROR") => CheckState::Failing,
+        Some("PENDING" | "EXPECTED") => CheckState::Running,
+        _ => CheckState::Unknown,
+    };
     pr.node_id = str_at(v, "id").map(str::to_string);
 
     let nodes = |path: &str| -> Vec<Value> {
@@ -335,4 +348,41 @@ pub(crate) fn stat_from_rest(v: &Value) -> Option<DiffStat> {
         lines_removed: u32_at(v, "deletions")?,
         max_file_lines: 0,
     })
+}
+
+#[cfg(test)]
+mod checks_tests {
+    use super::*;
+
+    fn pr_with(extra: Value) -> PullRequest {
+        let mut v = serde_json::json!({
+            "number": 1, "title": "t", "headRefName": "a", "baseRefName": "b",
+            "createdAt": "2026-01-01T00:00:00Z", "updatedAt": "2026-01-01T00:00:00Z"
+        });
+        v.as_object_mut()
+            .unwrap()
+            .extend(extra.as_object().unwrap().clone());
+        let repo = RepoRef {
+            host: "github.com".into(),
+            namespace: "o".into(),
+            slug: "r".into(),
+        };
+        pr_from_graphql(&v, &repo, None, &Teams::default())
+            .unwrap()
+            .0
+    }
+
+    #[test]
+    fn rollup_state_and_mergeable_map_to_checks_and_conflicts() {
+        let roll = |s: &str| serde_json::json!({"commits": {"nodes": [{"commit": {"statusCheckRollup": {"state": s}}}]}});
+        assert_eq!(pr_with(roll("SUCCESS")).checks, CheckState::Passing);
+        assert_eq!(pr_with(roll("FAILURE")).checks, CheckState::Failing);
+        assert_eq!(pr_with(roll("ERROR")).checks, CheckState::Failing);
+        assert_eq!(pr_with(roll("PENDING")).checks, CheckState::Running);
+        let none =
+            serde_json::json!({"commits": {"nodes": [{"commit": {"statusCheckRollup": null}}]}});
+        assert_eq!(pr_with(none).checks, CheckState::Unknown);
+        assert!(pr_with(serde_json::json!({"mergeable": "CONFLICTING"})).has_conflicts);
+        assert!(!pr_with(serde_json::json!({"mergeable": "UNKNOWN"})).has_conflicts);
+    }
 }
