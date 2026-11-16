@@ -177,6 +177,14 @@ pub const SCENES: &[SceneDef] = &[
             Scene::ReviewConversationEnd,
         )
     },
+    // the Commits tab: the demo commit is new since my last review
+    def(
+        "review-commits",
+        Screen::Review,
+        View::All,
+        None,
+        Scene::ReviewCommits,
+    ),
     // the same, with sample drafts (one blocked) and an open composer
     def(
         "review-drafts",

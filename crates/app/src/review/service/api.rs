@@ -46,7 +46,8 @@ impl ReviewService {
         Self::build(store, ctx, deps, Source::Remote(Arc::new(https_url)))
     }
 
-    /// Demo/test path: uses `repo_path` (holding both branches) directly, no fetch.
+    /// Test path: uses `repo_path` (holding both branches) directly, no fetch.
+    #[cfg(test)]
     pub fn with_local(
         store: Arc<Mutex<Store>>,
         repo_path: PathBuf,
@@ -58,6 +59,29 @@ impl ReviewService {
             store,
             ctx,
             fixed_deps(None, head_probe, comments),
+            Source::Local(repo_path),
+        )
+    }
+
+    /// Demo path: like the test path, with my last review answered by `last_review`.
+    pub fn with_local_reviewed(
+        store: Arc<Mutex<Store>>,
+        repo_path: PathBuf,
+        ctx: egui::Context,
+        head_probe: HeadProbe,
+        comments: CommentFetcher,
+        last_review: LastReviewFetcher,
+    ) -> ReviewService {
+        let deps = Arc::new(ReviewDeps {
+            auth: None,
+            probe: head_probe,
+            comments,
+            last_review,
+        });
+        Self::build(
+            store,
+            ctx,
+            Arc::new(move |_: &RepoRef| deps.clone()),
             Source::Local(repo_path),
         )
     }

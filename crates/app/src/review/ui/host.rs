@@ -175,12 +175,13 @@ impl ReviewHost {
                 let svc = self
                     .demo_service
                     .get_or_insert_with(|| {
-                        Arc::new(ReviewService::with_local(
+                        Arc::new(ReviewService::with_local_reviewed(
                             store.clone(),
                             fixture.repo_path.clone(),
                             ctx.clone(),
                             Arc::new(move |_, _| Ok(head.clone())),
                             Arc::new(|_, _| Ok(crate::demo::review_comments_demo())),
+                            Arc::new(|_, _| Ok(Some(crate::demo::demo_last_review()))),
                         ))
                     })
                     .clone();
@@ -286,6 +287,9 @@ impl ReviewHost {
         s.toggle_viewed(1);
         if self.shot_conversation {
             s.tab = Tab::Conversation;
+        }
+        if self.shot_commits {
+            s.tab = Tab::Commits;
         }
         if self.shot_conversation_end {
             s.conversation_to_end = true;

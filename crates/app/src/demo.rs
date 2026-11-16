@@ -1197,6 +1197,14 @@ export async function waitForGate(gate: Gate, ms = GATE_TIMEOUT_MS): Promise<boo
 "#;
 
 /// `review_comments`, plus threads on nested files of `demo_tree_files` (the demo app):
+/// My last review of the demo PR: a day ago, before the demo commit was made.
+pub fn demo_last_review() -> prcore::history::ReviewMark {
+    prcore::history::ReviewMark {
+        at: chrono::Utc::now() - chrono::Duration::days(1),
+        commit: None,
+    }
+}
+
 /// unresolved and resolved ones at different depths, a file-level one, and one in a
 /// directory the tree screenshot collapses.
 pub fn review_comments_demo() -> providers::provider::CommentList {

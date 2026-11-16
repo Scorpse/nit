@@ -70,6 +70,7 @@ pub struct ReviewDeps {
 /// credentials and provider).
 pub type DepsFn = Arc<dyn Fn(&RepoRef) -> Arc<ReviewDeps> + Send + Sync>;
 
+#[cfg(test)]
 pub(super) fn fixed_deps(
     auth: Option<GitAuth>,
     probe: HeadProbe,

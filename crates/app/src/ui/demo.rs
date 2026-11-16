@@ -167,6 +167,7 @@ impl App {
                     Scene::ReviewConversation | Scene::ReviewConversationEnd
                 );
                 self.review.shot_conversation_end = scene == Scene::ReviewConversationEnd;
+                self.review.shot_commits = scene == Scene::ReviewCommits;
                 self.review.shot_actions = scene == Scene::ReviewActions;
                 self.review.shot_drafts = scene == Scene::ReviewDrafts;
                 self.review.shot_selection = scene == Scene::ReviewSelection;
@@ -215,6 +216,7 @@ impl App {
             | Scene::ReviewTree
             | Scene::ReviewConversation
             | Scene::ReviewConversationEnd
+            | Scene::ReviewCommits
             | Scene::ReviewOutdated
             | Scene::ReviewSplit
             | Scene::ReviewHelp

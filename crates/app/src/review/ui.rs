@@ -227,6 +227,8 @@ pub struct ReviewHost {
     pub(crate) shot_tree: bool,
     /// Screenshot scene variant: open the Conversation tab.
     pub(crate) shot_conversation: bool,
+    /// Screenshot scene variant: open the Commits tab.
+    pub(crate) shot_commits: bool,
     /// Screenshot scene variant: scroll the Conversation tab to its end.
     pub(crate) shot_conversation_end: bool,
     /// Screenshot scene variant: select a "not in diff" entry once the comments are in.

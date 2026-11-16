@@ -76,6 +76,8 @@ pub enum Scene {
     ReviewConversation,
     /// `ReviewConversation` scrolled to its end (the unplaced comments).
     ReviewConversationEnd,
+    /// The review screen on the Commits tab: a commit after my last review is marked new.
+    ReviewCommits,
     /// The review screen with a "not in diff" entry selected (comments on a file that is
     /// not in the current diff).
     ReviewOutdated,
