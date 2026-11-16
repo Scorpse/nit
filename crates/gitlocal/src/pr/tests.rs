@@ -1001,3 +1001,43 @@ fn blobless_mirror_lazily_fetches_blobs_with_auth() {
         "blob was not lazily fetched"
     );
 }
+
+#[test]
+fn commit_log_lists_the_prs_own_commits_oldest_first() {
+    let f = fixture();
+    let r = f.remote.path();
+    g(r, &["checkout", "-q", "feature"]);
+    std::fs::write(
+        r.join("later.txt"),
+        "second
+",
+    )
+    .unwrap();
+    commit_all(r, "second | with a pipe");
+    g(r, &["checkout", "-q", "main"]);
+    let refs = fetch(&f, 9, "feature", "main").unwrap();
+    let log = commit_log(&git(), &f.local_repo, &refs).unwrap();
+    let subjects: Vec<&str> = log.iter().map(|c| c.subject.as_str()).collect();
+    assert_eq!(
+        subjects,
+        ["feature work", "second | with a pipe"],
+        "main's own c2 is not the PR's"
+    );
+    assert_eq!(log[1].id, refs.head);
+    assert_eq!(log[0].author, "t");
+    assert!(log[0].date <= log[1].date);
+
+    let none = PrRefs {
+        base: refs.head.clone(),
+        ..refs.clone()
+    };
+    assert!(commit_log(&git(), &f.local_repo, &none).unwrap().is_empty());
+    let bad = PrRefs {
+        base: "--all".into(),
+        ..refs
+    };
+    assert!(matches!(
+        commit_log(&git(), &f.local_repo, &bad),
+        Err(GitError::InvalidRef(_))
+    ));
+}

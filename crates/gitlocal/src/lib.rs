@@ -8,9 +8,9 @@ pub use discover::{
     MAX_VISITED_DIRS, NO_HTTPS_REMOTE,
 };
 pub use pr::{
-    batch_patches, batch_patches_cancellable, fetch_pr, file_counts, file_index, file_list,
-    file_patch, file_patches, file_text, host_slug, ref_prefix, resolve_commits, FetchSpec,
-    PatchBatch, PrRefs, MAX_PATCH_BYTES, MAX_PATHSPEC_BYTES,
+    batch_patches, batch_patches_cancellable, commit_log, fetch_pr, file_counts, file_index,
+    file_list, file_patch, file_patches, file_text, host_slug, ref_prefix, resolve_commits,
+    FetchSpec, PatchBatch, PrRefs, MAX_PATCH_BYTES, MAX_PATHSPEC_BYTES,
 };
 pub use probe::{ls_remote, LS_REMOTE_TIMEOUT};
 use runner::RunOpts;

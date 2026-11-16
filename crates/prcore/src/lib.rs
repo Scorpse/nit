@@ -5,6 +5,7 @@ pub mod commit;
 pub mod diff;
 pub mod draft;
 pub mod export;
+pub mod history;
 pub mod model;
 pub mod origin;
 pub mod stacks;

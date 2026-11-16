@@ -6,6 +6,7 @@ use crate::{validate_url, LocalRepo};
 use prcore::diff::{
     parse_diff_index, parse_diff_raw, parse_numstat, DiffFile, FileCounts, FileStatus,
 };
+use prcore::history::{parse_log, CommitInfo, LOG_FORMAT};
 
 /// Upper bound for one file's patch output; beyond this `GitError::TooLarge` is returned.
 pub const MAX_PATCH_BYTES: usize = 64 * 1024 * 1024;
@@ -206,6 +207,29 @@ pub fn resolve_commits(
         [a, b] if is_id(a) && is_id(b) => Ok([a.to_string(), b.to_string()]),
         _ => bad_ref("the branches did not resolve to commits"),
     }
+}
+
+/// Most commits `commit_log` lists; a PR with more shows its newest ones.
+pub const MAX_LOG_COMMITS: usize = 500;
+
+/// The commits of the PR, oldest first: those reachable from `refs.head` and not from
+/// `refs.base` (at most `MAX_LOG_COMMITS`, the newest). Reads commit objects only, so a
+/// blobless mirror downloads nothing.
+pub fn commit_log(
+    git: &Git,
+    local: &LocalRepo,
+    refs: &PrRefs,
+) -> Result<Vec<CommitInfo>, GitError> {
+    validate_operand("revision", &refs.base)?;
+    validate_operand("revision", &refs.head)?;
+    let range = format!("{}..{}", refs.base, refs.head);
+    let max = format!("--max-count={MAX_LOG_COMMITS}");
+    let out = git.run(
+        &local.path,
+        &["log", "-z", "--reverse", LOG_FORMAT, &max, &range, "--"],
+        None,
+    )?;
+    Ok(parse_log(&out))
 }
 
 const DIFF_COMMON: [&str; 4] = ["-M", "--no-ext-diff", "--no-textconv", "--no-color"];
