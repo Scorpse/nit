@@ -7,6 +7,7 @@ mod client;
 mod comments;
 pub mod graphql;
 mod inbox;
+mod mark;
 mod write;
 
 use std::collections::HashMap;
@@ -15,6 +16,7 @@ use std::time::{Duration, Instant};
 
 use async_trait::async_trait;
 use prcore::comments::{AnchorModel, Comment, NewComment, PrTask, ReviewAction, ThreadId};
+use prcore::history::ReviewMark;
 use prcore::model::{DiffStat, Forge, PrState, PullRequest, RepoInfo, RepoRef, UserRef};
 use reqwest::Method;
 use serde_json::{json, Value};
@@ -431,6 +433,14 @@ impl Provider for GitHubProvider {
 
     async fn comments(&self, repo: &RepoRef, id: u64) -> Result<CommentList, ProviderError> {
         comments::comments(&self.client, repo, id).await
+    }
+
+    async fn my_last_review(
+        &self,
+        repo: &RepoRef,
+        id: u64,
+    ) -> Result<Option<ReviewMark>, ProviderError> {
+        mark::my_last_review(&self.client, repo, id).await
     }
 
     async fn tasks(&self, _repo: &RepoRef, _id: u64) -> Result<Vec<PrTask>, ProviderError> {

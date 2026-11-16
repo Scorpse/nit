@@ -84,6 +84,15 @@ pub const REVIEWS: &str = r#"query($owner: String!, $name: String!, $number: Int
   }
 }"#;
 
+/// The viewer's latest review of one PR: when it was submitted and the commit it was made on.
+pub const MY_REVIEW: &str = r#"query($owner: String!, $name: String!, $number: Int!) {
+  repository(owner: $owner, name: $name) {
+    pullRequest(number: $number) {
+      viewerLatestReview { state submittedAt commit { oid } }
+    }
+  }
+}"#;
+
 /// Resolves a review thread by its node id ([mutations]; a write: sent through
 /// `GhClient::graphql_mutation`).
 ///

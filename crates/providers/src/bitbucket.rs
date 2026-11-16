@@ -7,6 +7,7 @@ use prcore::comments::{
     ThreadId, UNKNOWN_AUTHOR,
 };
 use prcore::draft::Side;
+use prcore::history::ReviewMark;
 use prcore::model::{
     CheckState, DiffStat, Forge, PrState, PullRequest, RepoInfo, RepoRef, ReviewState, Reviewer,
     UserRef,
@@ -21,6 +22,8 @@ use crate::provider::{
     Capabilities, CommentList, Discovered, PostRevision, PrList, Provider, ProviderError,
     ServerRevision, SkippedComment, SkippedPr,
 };
+
+mod mark;
 
 /// Bitbucket caps pull request list pages at 50 entries.
 const PR_PAGE_LEN: u32 = 50;
@@ -777,6 +780,22 @@ impl Provider for BitbucketProvider {
             _ => PrState::Open,
         };
         Ok(decode::<PrDto>(v)?.into_pr(repo, &state))
+    }
+
+    async fn my_last_review(
+        &self,
+        repo: &RepoRef,
+        id: u64,
+    ) -> Result<Option<ReviewMark>, ProviderError> {
+        let me = self.me().await?;
+        let v = self
+            .client
+            .get_json(&format!(
+                "/repositories/{}/{}/pullrequests/{id}",
+                repo.namespace, repo.slug
+            ))
+            .await?;
+        Ok(mark::mark_of(&v, &me.id))
     }
 
     async fn comments(&self, repo: &RepoRef, id: u64) -> Result<CommentList, ProviderError> {

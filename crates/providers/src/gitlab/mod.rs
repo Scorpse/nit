@@ -6,6 +6,7 @@ mod bases;
 mod client;
 mod comments;
 mod inbox;
+mod mark;
 pub mod position;
 mod write;
 
@@ -14,6 +15,7 @@ use std::sync::Mutex;
 
 use async_trait::async_trait;
 use prcore::comments::{AnchorModel, Comment, NewComment, PrTask, ReviewAction, ThreadId};
+use prcore::history::ReviewMark;
 use prcore::model::{DiffStat, Forge, PrState, PullRequest, RepoRef, UserRef};
 use reqwest::Method;
 use serde_json::{json, Value};
@@ -397,6 +399,20 @@ impl Provider for GitLabProvider {
         let (current, discussions) =
             tokio::join!(self.revision(repo, id), self.client.get_paged(&path));
         Ok(comments::decode(&discussions?, &current?))
+    }
+
+    /// The newest note of mine (`/notes`, newest first, one page of 100).
+    async fn my_last_review(
+        &self,
+        repo: &RepoRef,
+        id: u64,
+    ) -> Result<Option<ReviewMark>, ProviderError> {
+        let path = format!(
+            "{}/{id}/notes?order_by=created_at&sort=desc&per_page=100",
+            self.mrs_path(repo)
+        );
+        let (me, notes) = tokio::join!(self.me_cached(), self.client.get_json(&path));
+        Ok(mark::mark_of(&notes?, &me?.id))
     }
 
     async fn tasks(&self, _repo: &RepoRef, _id: u64) -> Result<Vec<PrTask>, ProviderError> {

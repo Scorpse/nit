@@ -3,6 +3,7 @@
 use async_trait::async_trait;
 pub use prcore::comments::{AnchorModel, PostRevision, ServerRevision};
 use prcore::comments::{Comment, NewComment, PrTask, ReviewAction, ThreadId};
+use prcore::history::ReviewMark;
 use prcore::model::{DiffStat, Forge, PrState, PullRequest, RepoInfo, RepoRef, UserRef};
 use thiserror::Error;
 
@@ -275,6 +276,15 @@ pub trait Provider: Send + Sync {
     /// inline post.
     async fn revision(&self, repo: &RepoRef, id: u64) -> Result<ServerRevision, ProviderError>;
     async fn comments(&self, repo: &RepoRef, id: u64) -> Result<CommentList, ProviderError>;
+    /// My last submitted review of the PR: when, and the commit it was made on where the forge
+    /// says. `Ok(None)`: I have not reviewed it, or the forge does not tell.
+    async fn my_last_review(
+        &self,
+        _repo: &RepoRef,
+        _id: u64,
+    ) -> Result<Option<ReviewMark>, ProviderError> {
+        Ok(None)
+    }
     /// The PR's tasks, read-only (unpublished drafts left out). Only called when
     /// `capabilities().tasks`; a forge without tasks answers `Invalid`.
     async fn tasks(&self, repo: &RepoRef, id: u64) -> Result<Vec<PrTask>, ProviderError>;
