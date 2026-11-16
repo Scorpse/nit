@@ -341,13 +341,9 @@ pub fn status_pills(pr: &PullRequest) -> Vec<(String, Color32)> {
     if pr.task_count > 0 {
         out.push((format!("{} open tasks", pr.task_count), AMBER));
     }
-    // every open PR says where its approval stands; a draft is not up for approval yet
-    if changes == 0 && !pr.draft {
-        out.push(if approved > 0 {
-            ("approved".into(), GREEN)
-        } else {
-            ("not approved".into(), GREY)
-        });
+    // only the yes is shown; no pill already means not approved
+    if changes == 0 && approved > 0 {
+        out.push(("approved".into(), GREEN));
     }
     out
 }
@@ -606,41 +602,42 @@ pub fn show_detail(ui: &mut Ui, d: &Detail) {
                         }
                     });
                     ui.end_row();
-                    ui.label(egui::RichText::new("Approval").color(GREY));
-                    ui.vertical(|ui| {
-                        let who = |s: ReviewState| {
-                            pr.reviewers
-                                .iter()
-                                .filter(|r| r.state == s)
-                                .map(|r| r.user.display_name.as_str())
-                                .collect::<Vec<_>>()
-                                .join(", ")
-                        };
-                        let changes = who(ReviewState::ChangesRequested);
-                        let approved = who(ReviewState::Approved);
-                        if !changes.is_empty() {
-                            ui.add(
-                                egui::Label::new(
-                                    egui::RichText::new(format!("changes requested by {changes}"))
+                    let who = |s: ReviewState| {
+                        pr.reviewers
+                            .iter()
+                            .filter(|r| r.state == s)
+                            .map(|r| r.user.display_name.as_str())
+                            .collect::<Vec<_>>()
+                            .join(", ")
+                    };
+                    let changes = who(ReviewState::ChangesRequested);
+                    let approved = who(ReviewState::Approved);
+                    if !changes.is_empty() || !approved.is_empty() {
+                        ui.label(egui::RichText::new("Approval").color(GREY));
+                        ui.vertical(|ui| {
+                            if !changes.is_empty() {
+                                ui.add(
+                                    egui::Label::new(
+                                        egui::RichText::new(format!(
+                                            "changes requested by {changes}"
+                                        ))
                                         .color(RED),
-                                )
-                                .wrap(),
-                            );
-                        }
-                        if !approved.is_empty() {
-                            ui.add(
-                                egui::Label::new(
-                                    egui::RichText::new(format!("approved by {approved}"))
-                                        .color(GREEN),
-                                )
-                                .wrap(),
-                            );
-                        }
-                        if changes.is_empty() && approved.is_empty() {
-                            ui.label("not approved");
-                        }
-                    });
-                    ui.end_row();
+                                    )
+                                    .wrap(),
+                                );
+                            }
+                            if !approved.is_empty() {
+                                ui.add(
+                                    egui::Label::new(
+                                        egui::RichText::new(format!("approved by {approved}"))
+                                            .color(GREEN),
+                                    )
+                                    .wrap(),
+                                );
+                            }
+                        });
+                        ui.end_row();
+                    }
                     ui.label(egui::RichText::new("Checks").color(GREY));
                     match pr.checks {
                         CheckState::Failing => ui.colored_label(RED, "failed"),

@@ -198,10 +198,7 @@ fn status_pills_put_what_needs_action_first_and_say_nothing_when_unknown() {
     let words = |pr: &PullRequest| -> Vec<String> {
         status_pills(pr).into_iter().map(|(t, _)| t).collect()
     };
-    assert_eq!(words(&pr), ["not approved"]);
-    pr.draft = true;
-    assert!(words(&pr).is_empty(), "a draft is not up for approval");
-    pr.draft = false;
+    assert!(words(&pr).is_empty(), "no approval: say nothing");
 
     let who = |n: &str, state| Reviewer {
         user: UserRef {
