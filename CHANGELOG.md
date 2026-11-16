@@ -8,7 +8,10 @@ While the version is below 1.0, minor versions may contain breaking changes.
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-16
+
 - Inbox rows show review and build status: changes requested, conflicts, checks failed, running or passed, open tasks and approvals. The detail pane adds Checks and Merge rows. Bitbucket reads build statuses with one extra request per open pull request; Bitbucket has no conflict flag.
+
 ## [0.1.1] - 2026-11-16
 
 - Inline comments on Bitbucket can be posted: the anchoring was checked against a real pull request (added and context lines anchor to the new-file line, deleted lines to the old-file line). `NIT_INLINE_EXPERIMENT` is gone. Bitbucket has no multi-line comments.
@@ -54,6 +57,7 @@ First public version. Windows, Linux and macOS. Bitbucket Cloud, GitHub and GitL
 - PRs from Bitbucket forks are not supported; only open PRs can be reviewed; SSH remotes are ignored.
 - macOS and Linux builds are newer and have had less testing than Windows; the macOS disk images are not signed or notarised.
 
-[Unreleased]: https://github.com/Scorpse/nit/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/Scorpse/nit/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/Scorpse/nit/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/Scorpse/nit/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/Scorpse/nit/releases/tag/v0.1.0
