@@ -1202,8 +1202,8 @@ fn small_pr_is_prefetched_whole_with_one_git_process() {
     let (_, files) = open_and_wait(&svc, &f);
     wait_for("whole PR", || files.iter().all(|d| svc.is_cached(&d.path)));
     std::thread::sleep(Duration::from_millis(300));
-    // refs (1), merge-base (1), file list (2), then every patch of the PR (1)
-    assert_eq!(git.spawn_count(), 5);
+    // refs (1), merge-base (1), file list (2), commit log (1), then every patch of the PR (1)
+    assert_eq!(git.spawn_count(), 6);
     assert_eq!(svc.patches_built(), 0);
     assert!(svc.batches_run() >= 1);
     // browsing now needs no git at all
@@ -1217,7 +1217,7 @@ fn small_pr_is_prefetched_whole_with_one_git_process() {
         .iter()
         .any(|e| matches!(e, ReviewEvent::PatchFailed { .. })));
     std::thread::sleep(Duration::from_millis(300));
-    assert_eq!(git.spawn_count(), 5);
+    assert_eq!(git.spawn_count(), 6);
 }
 
 #[test]
@@ -1322,6 +1322,7 @@ fn one_service_serves_many_opens_with_fresh_deps() {
             auth: None,
             probe: Arc::new(move |_, _| Ok(head.clone())),
             comments: no_comments(),
+            last_review: Arc::new(|_, _| Ok(None)),
         })
     });
     let svc = ReviewService::build(
@@ -2017,4 +2018,80 @@ fn a_file_over_its_time_budget_keeps_what_was_coloured() {
     let kept = st.hl.request("big.ts", &rows).expect("remembered");
     let coloured = kept.iter().filter(|s| !s.is_empty()).count();
     assert!(coloured > 0 && coloured < rows.len(), "{coloured}");
+}
+
+#[test]
+fn open_lists_the_commits_and_reads_my_last_review() {
+    let f = review_fixture();
+    let head = f.head.clone();
+    let mark = prcore::history::ReviewMark {
+        at: chrono::Utc::now(),
+        commit: Some(f.head.clone()),
+    };
+    let m = mark.clone();
+    let deps: DepsFn = Arc::new(move |_: &RepoRef| {
+        let head = head.clone();
+        let m = m.clone();
+        Arc::new(ReviewDeps {
+            auth: None,
+            probe: Arc::new(move |_, _| Ok(head.clone())),
+            comments: no_comments(),
+            last_review: Arc::new(move |_, _| Ok(Some(m.clone()))),
+        })
+    });
+    let svc = ReviewService::build(
+        store(),
+        egui::Context::default(),
+        deps,
+        Source::Local(f.repo_path.clone()),
+    );
+    svc.open(f.repo.clone(), f.pr.clone());
+    let evs = collect_until(&svc, |e| {
+        e.iter().any(|x| matches!(x, ReviewEvent::LastReview(_))) || failed(e)
+    });
+    let commits = evs
+        .iter()
+        .find_map(|e| match e {
+            ReviewEvent::Commits(c) => Some(c.clone()),
+            _ => None,
+        })
+        .unwrap_or_else(|| panic!("no commits in {evs:?}"));
+    assert!(!commits.is_empty());
+    assert_eq!(
+        commits.last().unwrap().id,
+        f.head,
+        "oldest first, head last"
+    );
+    assert!(evs
+        .iter()
+        .any(|e| matches!(e, ReviewEvent::LastReview(Some(got)) if *got == mark)));
+}
+
+#[test]
+fn a_failing_last_review_read_does_not_fail_the_open() {
+    let f = review_fixture();
+    let head = f.head.clone();
+    let deps: DepsFn = Arc::new(move |_: &RepoRef| {
+        let head = head.clone();
+        Arc::new(ReviewDeps {
+            auth: None,
+            probe: Arc::new(move |_, _| Ok(head.clone())),
+            comments: no_comments(),
+            last_review: Arc::new(|_, _| Err("network error".into())),
+        })
+    });
+    let svc = ReviewService::build(
+        store(),
+        egui::Context::default(),
+        deps,
+        Source::Local(f.repo_path.clone()),
+    );
+    svc.open(f.repo.clone(), f.pr.clone());
+    let evs = collect_until(&svc, |e| {
+        e.iter()
+            .any(|x| matches!(x, ReviewEvent::LastReviewFailed(_)))
+            || failed(e)
+    });
+    assert!(!failed(&evs));
+    assert!(evs.iter().any(|e| matches!(e, ReviewEvent::Commits(_))));
 }

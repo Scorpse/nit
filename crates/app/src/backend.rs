@@ -29,7 +29,9 @@ use providers::provider::set_review_checked;
 
 use crate::lock::lock_ok;
 use crate::review::composer::{CommentPoster, PostError, Poster};
-use crate::review::{CommentFetcher, DepsFn, HeadProbe, ReviewDeps, ReviewService};
+use crate::review::{
+    CommentFetcher, DepsFn, HeadProbe, LastReviewFetcher, ReviewDeps, ReviewService,
+};
 
 mod accounts;
 mod messages;

@@ -43,6 +43,7 @@ impl ReviewScreen {
             visible_sent: None,
             visible_now: None,
             comments: Comments::new(),
+            commits: Commits::default(),
             tab: Tab::Diff,
             comments_refresh: false,
             actions: ReviewActions::new(ReviewContext::default()),
@@ -157,6 +158,10 @@ impl ReviewScreen {
                 self.refresh_marks(true);
             }
             ReviewEvent::CommentsFailed(e) => self.comments.fail(e),
+            ReviewEvent::Commits(list) => self.commits.set_list(list),
+            ReviewEvent::CommitsFailed(e) => self.commits.fail(e),
+            ReviewEvent::LastReview(mark) => self.commits.set_mark(mark),
+            ReviewEvent::LastReviewFailed(e) => self.commits.fail_mark(e),
         }
     }
 

@@ -50,6 +50,11 @@ pub type HeadProbe = Arc<dyn Fn(&RepoRef, u64) -> Result<String, String> + Send 
 /// Returns every comment of the PR (`Provider::comments()`); errors are category text.
 pub type CommentFetcher = Arc<dyn Fn(&RepoRef, u64) -> Result<CommentList, String> + Send + Sync>;
 
+/// Returns my last submitted review of the PR (`Provider::my_last_review()`); `None` when I
+/// have none or the forge does not say; errors are category text.
+pub type LastReviewFetcher =
+    Arc<dyn Fn(&RepoRef, u64) -> Result<Option<ReviewMark>, String> + Send + Sync>;
+
 pub(super) type UrlFor = Arc<dyn Fn(&RepoRef) -> String + Send + Sync>;
 
 /// What one open needs from the signed-in user: git credentials, the head probe and the
@@ -58,6 +63,7 @@ pub struct ReviewDeps {
     pub auth: Option<GitAuth>,
     pub probe: HeadProbe,
     pub comments: CommentFetcher,
+    pub last_review: LastReviewFetcher,
 }
 
 /// Called once per open, on the open's thread, with the repository opened (its account's
@@ -73,6 +79,7 @@ pub(super) fn fixed_deps(
         auth,
         probe,
         comments,
+        last_review: Arc::new(|_, _| Ok(None)),
     });
     Arc::new(move |_: &RepoRef| deps.clone())
 }
@@ -121,6 +128,14 @@ pub enum ReviewEvent {
     },
     /// Fetching comments failed; the diff is unaffected.
     CommentsFailed(String),
+    /// The PR's commits, oldest first (after `Opened`).
+    Commits(Vec<CommitInfo>),
+    /// The commits could not be listed; the diff is unaffected.
+    CommitsFailed(String),
+    /// My last submitted review (`None`: none, or the forge does not say).
+    LastReview(Option<ReviewMark>),
+    /// My last review could not be read; the commits are still shown, none marked new.
+    LastReviewFailed(String),
 }
 
 /// `https://<host>/<namespace>/<slug>.git` on the repository's own host (`bitbucket.org`,

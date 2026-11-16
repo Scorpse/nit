@@ -11,7 +11,8 @@ pub(super) fn review_deps(
     let owner = reg.owner(repo);
     let auth = reg.account(&owner).and_then(|a| git_auth(secrets, &a));
     let provider = reg.get(&owner).ok();
-    let (p2, h1, h2) = (provider.clone(), handle.clone(), handle.clone());
+    let (p2, p3) = (provider.clone(), provider.clone());
+    let (h1, h2, h3) = (handle.clone(), handle.clone(), handle.clone());
     let probe: HeadProbe = Arc::new(move |repo, id| {
         let p = provider
             .as_ref()
@@ -25,10 +26,16 @@ pub(super) fn review_deps(
         h2.block_on(p.comments(repo, id))
             .map_err(|e| e.user_message())
     });
+    let last_review: LastReviewFetcher = Arc::new(move |repo, id| {
+        let p = p3.as_ref().ok_or_else(|| "not signed in".to_string())?;
+        h3.block_on(p.my_last_review(repo, id))
+            .map_err(|e| e.user_message())
+    });
     Arc::new(ReviewDeps {
         auth,
         probe,
         comments,
+        last_review,
     })
 }
 

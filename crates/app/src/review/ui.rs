@@ -26,6 +26,7 @@ use super::comments_ui::{
     is_flagged, is_open, measure_with, outdated_note, paint_card, reason_note, scope, title_rect,
     CardLayout, CardToggle, Comments, Scope, CARD_MARGIN,
 };
+use super::commits_ui::Commits;
 use super::composer::{
     confirm_dialog, draft_card, draft_height, draft_widget, drafts_bar, editor_card, editor_height,
     editor_widget, reply_widgets, thread_buttons, toast, Act, Composer, MemoryPoster, Poster, Slot,
@@ -121,6 +122,7 @@ pub struct ReviewScreen {
     /// The diff's first visible row this frame.
     visible_now: Option<(String, usize)>,
     pub comments: Comments,
+    pub commits: Commits,
     pub tab: Tab,
     /// "Refresh comments" was pressed; the host asks the service, drained each frame.
     comments_refresh: bool,
@@ -202,6 +204,7 @@ impl OpenTimings {
 pub enum Tab {
     Diff,
     Conversation,
+    Commits,
 }
 
 /// What `App` keeps for the review screen.
@@ -249,6 +252,7 @@ pub struct ReviewHost {
     pub(crate) shot_help: bool,
 }
 
+mod commits;
 mod conversation;
 mod diffpane;
 mod filelist;
@@ -260,6 +264,7 @@ mod screen;
 mod selecting;
 mod topbar;
 
+use self::commits::*;
 use self::conversation::*;
 use self::diffpane::*;
 use self::filelist::*;

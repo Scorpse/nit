@@ -7,6 +7,7 @@ pub mod authors;
 mod cache;
 pub mod columns;
 pub mod comments_ui;
+pub mod commits_ui;
 pub mod composer;
 pub mod diffview;
 pub mod export_ui;
@@ -26,6 +27,6 @@ mod worddiff;
 pub use cache::{PatchCache, PATCH_CACHE_BYTES};
 #[allow(unused_imports)]
 pub use service::{
-    remember_clones, CommentFetcher, DepsFn, HeadProbe, ReviewDeps, ReviewEvent, ReviewService,
-    PLAIN_CHANGED_LINES, PREFETCH_RADIUS,
+    remember_clones, CommentFetcher, DepsFn, HeadProbe, LastReviewFetcher, ReviewDeps, ReviewEvent,
+    ReviewService, PLAIN_CHANGED_LINES, PREFETCH_RADIUS,
 };

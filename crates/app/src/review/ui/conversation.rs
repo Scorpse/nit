@@ -9,12 +9,14 @@ pub(super) fn draw_center(ui: &mut Ui, s: &mut ReviewScreen, acts: &mut Vec<Act>
         ui.selectable_value(&mut s.tab, Tab::Diff, "Diff");
         let n = s.comments.pr_level.len();
         ui.selectable_value(&mut s.tab, Tab::Conversation, format!("Conversation ({n})"));
+        ui.selectable_value(&mut s.tab, Tab::Commits, commits_tab_label(&s.commits));
     });
     ui.separator();
     let mut toggles = Vec::new();
     match s.tab {
         Tab::Diff => draw_diff_pane(ui, s, &mut toggles, acts),
         Tab::Conversation => draw_conversation(ui, s, &mut toggles, acts),
+        Tab::Commits => draw_commits(ui, s),
     }
     if !toggles.is_empty() {
         // the new heights are laid out on the next frame
