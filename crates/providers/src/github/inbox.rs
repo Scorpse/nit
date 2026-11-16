@@ -160,6 +160,7 @@ fn base_pr(repo: &RepoRef) -> PullRequest {
         locked: false,
         checks: Default::default(),
         has_conflicts: false,
+        new_commits: false,
     }
 }
 

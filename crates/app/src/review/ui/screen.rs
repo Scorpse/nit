@@ -158,11 +158,33 @@ impl ReviewScreen {
                 self.refresh_marks(true);
             }
             ReviewEvent::CommentsFailed(e) => self.comments.fail(e),
-            ReviewEvent::Commits(list) => self.commits.set_list(list),
+            ReviewEvent::Commits(list) => {
+                self.commits.set_list(list);
+                self.save_caught_up();
+            }
             ReviewEvent::CommitsFailed(e) => self.commits.fail(e),
-            ReviewEvent::LastReview(mark) => self.commits.set_mark(mark),
+            ReviewEvent::LastReview(mark) => {
+                self.commits.set_mark(mark);
+                self.save_caught_up();
+            }
             ReviewEvent::LastReviewFailed(e) => self.commits.fail_mark(e),
         }
+    }
+
+    /// Remembers the head I am caught up to (as of my last review), so the inbox can flag
+    /// the PR once it moves on. Nothing is saved without a review of mine.
+    fn save_caught_up(&mut self) {
+        if let Some(head) = self.commits.caught_up_head() {
+            self.write_caught_up(head);
+        }
+    }
+
+    fn write_caught_up(&self, head: String) {
+        let key = caught_up_key(&self.repo, self.pr.id);
+        self.writes
+            .write("Could not save the review point", move |st| {
+                st.set_meta(&key, &head)
+            });
     }
 
     /// "Refresh comments": shows the spinner and asks the host to refetch.
@@ -599,9 +621,14 @@ impl ReviewScreen {
     /// Finished posts, resolves and review actions; a post the server could not echo
     /// triggers a refetch, a head that moved makes the screen stale.
     pub fn poll_composer(&mut self) {
+        let acted = self.actions.done.is_some();
         if self.actions.poll(&mut self.pr, &self.composer.head) {
             self.stale = true;
             self.composer.stale = true;
+        }
+        // a review action just went through: I am caught up to the head it was made on
+        if !acted && self.actions.done.is_some() && !self.composer.head.is_empty() {
+            self.write_caught_up(self.composer.head.clone());
         }
         let out = self.composer.poll(&mut self.comments);
         if out.refresh {

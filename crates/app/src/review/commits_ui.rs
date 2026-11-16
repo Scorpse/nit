@@ -42,6 +42,20 @@ impl Commits {
         }
     }
 
+    /// The newest commit that is not new (the PR's head when nothing is new; empty when every
+    /// commit is). `None` until the commits and my last review are known, when I have no
+    /// review (nothing to be caught up to) and when the PR has no commits of its own.
+    pub fn caught_up_head(&self) -> Option<String> {
+        let list = self.list.as_ref()?;
+        self.mark.as_ref()?.as_ref()?;
+        if list.is_empty() {
+            return None;
+        }
+        let flags = self.new_flags();
+        let seen = list.iter().zip(&flags).rev().find(|(_, new)| !**new);
+        Some(seen.map(|(c, _)| c.id.clone()).unwrap_or_default())
+    }
+
     pub fn new_count(&self) -> usize {
         self.new_flags().into_iter().filter(|n| *n).count()
     }

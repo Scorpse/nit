@@ -646,3 +646,39 @@ fn bench_snapshot_with_writers() {
     );
     drop(guard);
 }
+
+#[test]
+fn a_pr_whose_head_moved_past_the_one_i_was_caught_up_to_is_flagged() {
+    use prcore::history::caught_up_key;
+    let store = Store::open_in_memory().unwrap();
+    populate(&store, 1, 3);
+    let reader = store.reader();
+    let prs = read_snapshot(&reader).unwrap().prs;
+    assert!(
+        prs.iter().all(|p| !p.new_commits),
+        "nothing saved, nothing flagged"
+    );
+    assert!(prs.iter().all(|p| !p.source_commit.is_empty()));
+    let key = |p: &prcore::model::PullRequest| caught_up_key(&p.repo, p.id);
+    store.set_meta(&key(&prs[0]), &"0".repeat(40)).unwrap();
+    store
+        .set_meta(&key(&prs[1]), &prs[1].source_commit)
+        .unwrap();
+    store.set_meta(&key(&prs[2]), "").unwrap();
+    let got = read_snapshot(&reader).unwrap().prs;
+    let flag = |i: usize| {
+        got.iter()
+            .find(|p| p.id == prs[i].id)
+            .map(|p| p.new_commits)
+            .unwrap()
+    };
+    assert!(flag(0), "the head moved on");
+    assert!(!flag(1), "still at the head I was caught up to");
+    assert!(flag(2), "every commit was new at the time");
+    store.delete_meta(&key(&prs[0])).unwrap();
+    assert!(!read_snapshot(&reader)
+        .unwrap()
+        .prs
+        .iter()
+        .any(|p| p.id == prs[0].id && p.new_commits));
+}

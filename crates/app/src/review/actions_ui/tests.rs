@@ -49,6 +49,7 @@ fn pr(id: u64, reviewers: Vec<(UserRef, ReviewState)>) -> PullRequest {
         locked: false,
         checks: Default::default(),
         has_conflicts: false,
+        new_commits: false,
     }
 }
 

@@ -317,6 +317,20 @@ fn size_job(d: &DiffStat, forge: Forge) -> LayoutJob {
     job
 }
 
+/// Pill fills for what is bad and what is good: white text reads on both (the bright
+/// `RED` and `GREEN` text colours are too light for it, and black on them was hard to read).
+const BADGE_RED: Color32 = Color32::from_rgb(185, 50, 50);
+const BADGE_GREEN: Color32 = Color32::from_rgb(35, 135, 65);
+
+/// The text colour that reads on pill fill `bg`: black on the amber warning, else white.
+fn pill_text(bg: Color32) -> Color32 {
+    if bg == AMBER {
+        Color32::BLACK
+    } else {
+        Color32::WHITE
+    }
+}
+
 /// The status pills of an open PR, in display order: what a reviewer or author must act on
 /// first (changes requested, failed checks, conflicts), then the good news.
 pub fn status_pills(pr: &PullRequest) -> Vec<(String, Color32)> {
@@ -327,23 +341,26 @@ pub fn status_pills(pr: &PullRequest) -> Vec<(String, Color32)> {
     );
     let mut out = Vec::new();
     if changes > 0 {
-        out.push(("changes requested".into(), RED));
+        out.push(("changes requested".into(), BADGE_RED));
     }
     if pr.has_conflicts {
-        out.push(("conflicts".into(), RED));
+        out.push(("conflicts".into(), BADGE_RED));
     }
     match pr.checks {
-        CheckState::Failing => out.push(("checks failed".into(), RED)),
+        CheckState::Failing => out.push(("checks failed".into(), BADGE_RED)),
         CheckState::Running => out.push(("checks running".into(), AMBER)),
-        CheckState::Passing => out.push(("checks passed".into(), GREEN)),
+        CheckState::Passing => out.push(("checks passed".into(), BADGE_GREEN)),
         CheckState::Unknown => {}
     }
     if pr.task_count > 0 {
         out.push((format!("{} open tasks", pr.task_count), AMBER));
     }
+    if pr.new_commits {
+        out.push(("new commits".into(), AMBER));
+    }
     // only the yes is shown; no pill already means not approved
     if changes == 0 && approved > 0 {
-        out.push(("approved".into(), GREEN));
+        out.push(("approved".into(), BADGE_GREEN));
     }
     out
 }
@@ -372,8 +389,8 @@ fn pr_row(ui: &mut Ui, row: &InboxRow, depth: u8, selected: bool) -> egui::Respo
                     right - 10.0,
                     cy,
                     over_limit_label(row.pr.forge),
-                    Color32::WHITE,
-                    Color32::from_rgb(170, 40, 40),
+                    pill_text(AMBER),
+                    AMBER,
                     true,
                 );
             }
@@ -392,7 +409,7 @@ fn pr_row(ui: &mut Ui, row: &InboxRow, depth: u8, selected: bool) -> egui::Respo
 
     // status pills left of the size badge (they are listed right to left)
     for (text, color) in status_pills(&row.pr).iter().rev() {
-        right = pill(&p, right - 8.0, cy, text, Color32::BLACK, *color, true);
+        right = pill(&p, right - 8.0, cy, text, pill_text(*color), *color, true);
     }
 
     // Left side, clipped so it can never run into the right side.

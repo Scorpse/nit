@@ -15,6 +15,7 @@ use eframe::egui::{
 };
 use prcore::comments::OutdatedReason;
 use prcore::diff::{DiffFile, FileStatus, RowKind};
+use prcore::history::caught_up_key;
 use prcore::model::{PullRequest, RepoRef};
 use store::{Store, StoreWriter};
 

@@ -229,4 +229,11 @@ fn status_pills_put_what_needs_action_first_and_say_nothing_when_unknown() {
     pr.reviewers
         .retain(|r| r.state != ReviewState::ChangesRequested);
     assert_eq!(words(&pr).last().unwrap(), "approved");
+    pr.new_commits = true;
+    let w = words(&pr);
+    assert_eq!(
+        &w[w.len() - 2..],
+        ["new commits", "approved"],
+        "new commits come before the good news"
+    );
 }

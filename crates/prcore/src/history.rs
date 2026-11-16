@@ -23,6 +23,18 @@ pub struct ReviewMark {
     pub commit: Option<String>,
 }
 
+/// The meta key holding the head commit of PR `id` as of my last review (see
+/// `Commits::caught_up_head`): the inbox flags the PR when its head moved on.
+pub fn caught_up_key(repo: &crate::model::RepoRef, id: u64) -> String {
+    format!(
+        "{CAUGHT_UP_PREFIX}{}/{}/{}#{id}",
+        repo.host, repo.namespace, repo.slug
+    )
+}
+
+/// What every `caught_up_key` starts with.
+pub const CAUGHT_UP_PREFIX: &str = "caught_up:";
+
 /// `git log` format for `parse_log`: id, author, committer date (ISO 8601), subject; fields
 /// separated by U+001F, entries by NUL (`-z`).
 pub const LOG_FORMAT: &str = "--format=%H%x1f%an%x1f%cI%x1f%s";

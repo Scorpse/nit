@@ -230,6 +230,10 @@ impl eframe::App for App {
                 }
                 if back {
                     self.screen = Screen::Inbox;
+                    // the closed review saved what it knew (the commits I am caught up to)
+                    if let Some(b) = self.backend.as_ref() {
+                        b.request_snapshot();
+                    }
                 }
             }
         }

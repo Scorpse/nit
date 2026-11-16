@@ -50,6 +50,7 @@ fn pr(repo_name: &str, id: u64) -> PullRequest {
         locked: false,
         checks: Default::default(),
         has_conflicts: false,
+        new_commits: false,
     }
 }
 

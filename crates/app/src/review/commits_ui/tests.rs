@@ -49,6 +49,32 @@ fn commits_after_my_review_are_new_whatever_arrives_first() {
 }
 
 #[test]
+fn caught_up_is_the_newest_commit_before_the_new_ones() {
+    let mut c = Commits::default();
+    assert_eq!(c.caught_up_head(), None);
+    c.set_list(vec![commit('a', 8), commit('b', 10), commit('c', 11)]);
+    assert_eq!(c.caught_up_head(), None, "the review is not known yet");
+    c.set_mark(None);
+    assert_eq!(
+        c.caught_up_head(),
+        None,
+        "no review of mine: nothing to be caught up to"
+    );
+    c.set_mark(Some(mark(9)));
+    assert_eq!(c.caught_up_head(), Some(commit('a', 8).id));
+    c.set_mark(Some(mark(12)));
+    assert_eq!(
+        c.caught_up_head(),
+        Some(commit('c', 11).id),
+        "nothing new: the head"
+    );
+    c.set_mark(Some(mark(7)));
+    assert_eq!(c.caught_up_head(), Some(String::new()), "everything new");
+    c.set_list(vec![]);
+    assert_eq!(c.caught_up_head(), None, "no commits of its own");
+}
+
+#[test]
 fn a_failed_review_read_says_so_and_marks_nothing() {
     let mut c = Commits::default();
     c.set_list(vec![commit('a', 8)]);

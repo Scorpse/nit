@@ -221,6 +221,7 @@ fn pr(slug: &str, id: u64, title: &str, author: &UserRef, age_min: i64) -> PullR
         locked: false,
         checks: Default::default(),
         has_conflicts: false,
+        new_commits: false,
     }
 }
 

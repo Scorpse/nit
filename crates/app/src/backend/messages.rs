@@ -1,4 +1,6 @@
 use super::*;
+use prcore::commit::same_commit;
+use prcore::history::{caught_up_key, CAUGHT_UP_PREFIX};
 
 pub enum Msg {
     Connected(UserRef),
@@ -96,9 +98,17 @@ pub(super) fn snapshot_builds(
 /// that the sync and the writers hold (WAL readers do not wait for writers).
 pub fn read_snapshot(reader: &StoreReader) -> Result<Snapshot, store::StoreError> {
     let c = reader.cache_snapshot()?;
+    // an unreadable marker only loses the "new commits" flags
+    let caught_up = reader.meta_prefix(CAUGHT_UP_PREFIX).unwrap_or_default();
     let mut prs = Vec::with_capacity(c.prs.len());
     let mut stats = HashMap::new();
-    for (p, stat) in c.prs {
+    for (mut p, stat) in c.prs {
+        p.new_commits = !p.source_commit.is_empty()
+            && caught_up
+                .get(&caught_up_key(&p.repo, p.id))
+                .is_some_and(|head| {
+                    *head != p.source_commit && !same_commit(head, &p.source_commit)
+                });
         if let Some((_, d)) = stat {
             stats.insert((p.repo.clone(), p.id), d);
         }

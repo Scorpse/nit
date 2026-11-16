@@ -226,6 +226,17 @@ impl StoreReader {
     pub fn cache_snapshot(&self) -> StoreResult<CacheSnapshot> {
         cache_snapshot_in(&self.read)
     }
+
+    /// Every meta entry whose key starts with `prefix` (which holds no `%`, `_` or `\`).
+    pub fn meta_prefix(
+        &self,
+        prefix: &str,
+    ) -> StoreResult<std::collections::HashMap<String, String>> {
+        let conn = lock(&self.read);
+        let mut stmt = conn.prepare_cached("SELECT key, value FROM meta WHERE key LIKE ?1")?;
+        let rows = stmt.query_map([format!("{prefix}%")], |r| Ok((r.get(0)?, r.get(1)?)))?;
+        Ok(rows.collect::<Result<_, _>>()?)
+    }
 }
 
 pub(super) fn cache_snapshot_in(read: &Conn) -> StoreResult<CacheSnapshot> {

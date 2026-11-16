@@ -198,6 +198,7 @@ pub(crate) fn mr(v: &Value, repo: &RepoRef) -> Result<PullRequest, SkippedPr> {
         locked,
         checks: checks_of(v),
         has_conflicts: v["has_conflicts"].as_bool() == Some(true),
+        new_commits: false,
     })
 }
 

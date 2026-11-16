@@ -580,6 +580,7 @@ fn pr(id: u64, state: PrState, reviewers: Vec<ReviewState>) -> PullRequest {
         locked: false,
         checks: Default::default(),
         has_conflicts: false,
+        new_commits: false,
     }
 }
 

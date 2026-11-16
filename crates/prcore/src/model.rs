@@ -259,6 +259,10 @@ pub struct PullRequest {
     /// The forge reports the PR cannot merge cleanly (a conflict with the target).
     #[serde(default)]
     pub has_conflicts: bool,
+    /// Commits were added since my last review, as nit last saw it (set when the inbox is
+    /// read from the store, never saved with the PR).
+    #[serde(default, skip_serializing)]
+    pub new_commits: bool,
 }
 
 impl PullRequest {
