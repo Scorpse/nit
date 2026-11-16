@@ -177,6 +177,10 @@ async fn prs_open_maps_every_field() {
                 user("{gggg}", "Grace Unlisted Approver"),
                 ReviewState::Approved
             ),
+            (
+                user("{hhhh}", "Heidi Unlisted Changes"),
+                ReviewState::ChangesRequested
+            ),
         ]
     );
     assert_eq!(
@@ -448,7 +452,7 @@ async fn prs_tolerate_missing_uuid_in_author_and_reviewer() {
     assert!(list.skipped.is_empty(), "{:?}", list.skipped);
     let pr = &list.prs[0];
     assert_eq!(pr.author, user("", "Alice Author"));
-    assert_eq!(pr.reviewers.len(), 5);
+    assert_eq!(pr.reviewers.len(), 6);
     assert_eq!(pr.reviewers[0].user, user("", "Bob Approver"));
 }
 

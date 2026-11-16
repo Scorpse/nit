@@ -195,7 +195,13 @@ fn status_pills_put_what_needs_action_first_and_say_nothing_when_unknown() {
     pr.task_count = 0;
     pr.has_conflicts = false;
     pr.checks = CheckState::Unknown;
-    assert!(status_pills(&pr).is_empty());
+    let words = |pr: &PullRequest| -> Vec<String> {
+        status_pills(pr).into_iter().map(|(t, _)| t).collect()
+    };
+    assert_eq!(words(&pr), ["not approved"]);
+    pr.draft = true;
+    assert!(words(&pr).is_empty(), "a draft is not up for approval");
+    pr.draft = false;
 
     let who = |n: &str, state| Reviewer {
         user: UserRef {
@@ -214,15 +220,16 @@ fn status_pills_put_what_needs_action_first_and_say_nothing_when_unknown() {
     pr.checks = CheckState::Failing;
     pr.has_conflicts = true;
     pr.task_count = 2;
-    let words: Vec<String> = status_pills(&pr).into_iter().map(|(t, _)| t).collect();
     assert_eq!(
-        words,
+        words(&pr),
         [
-            "changes requested 1",
+            "changes requested",
             "conflicts",
             "checks failed",
-            "2 open tasks",
-            "approved 2"
+            "2 open tasks"
         ]
     );
+    pr.reviewers
+        .retain(|r| r.state != ReviewState::ChangesRequested);
+    assert_eq!(words(&pr).last().unwrap(), "approved");
 }

@@ -8,6 +8,7 @@ While the version is below 1.0, minor versions may contain breaking changes.
 
 ## [Unreleased]
 
+- Every open pull request in the inbox now says where its approval stands (approved, not approved, changes requested), and the detail pane has an Approval row.
 - Bitbucket: people who approved or requested changes are shown even when they were never added as reviewers; before, their approval was hidden.
 ## [0.1.2] - 2026-11-16
 
