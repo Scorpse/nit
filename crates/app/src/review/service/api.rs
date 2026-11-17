@@ -77,6 +77,7 @@ impl ReviewService {
             probe: head_probe,
             comments,
             last_review,
+            create_task: Arc::new(|_, _, _| Err("tasks are not available here".into())),
         });
         Self::build(
             store,
@@ -288,6 +289,17 @@ impl ReviewService {
                 check_stale(&s, gen, &sess);
             })
             .is_ok()
+    }
+
+    /// Adds a task to the open PR (answered by `TaskCreated`); a no-op until the PR is open.
+    pub fn create_task(&self, content: String) {
+        let st = self.shared.lock();
+        let Some(sess) = st.session.clone() else {
+            return;
+        };
+        let gen = st.gen;
+        drop(st);
+        spawn_create_task(&self.shared, gen, sess, content);
     }
 
     /// Fetches the comments again ("Refresh comments"); a no-op until the PR is open.

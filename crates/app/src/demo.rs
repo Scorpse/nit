@@ -990,7 +990,29 @@ pub fn review_comments() -> providers::provider::CommentList {
     providers::provider::CommentList {
         comments,
         skipped: Vec::new(),
-        tasks: None,
+        tasks: Some(vec![
+            prcore::comments::PrTask {
+                id: 1,
+                state: prcore::comments::TaskState::Open,
+                content: "Add a test for a module whose lock entry is missing.".into(),
+                creator: ben.clone(),
+                comment_id: None,
+            },
+            prcore::comments::PrTask {
+                id: 2,
+                state: prcore::comments::TaskState::Open,
+                content: "Check that `build/` is not needed by the release pipeline.".into(),
+                creator: ana.clone(),
+                comment_id: Some(prcore::comments::CommentId::from(16)),
+            },
+            prcore::comments::PrTask {
+                id: 3,
+                state: prcore::comments::TaskState::Resolved,
+                content: "Untrack the generated bundles.".into(),
+                creator: ana.clone(),
+                comment_id: Some(prcore::comments::CommentId::from(17)),
+            },
+        ]),
     }
 }
 

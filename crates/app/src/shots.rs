@@ -166,6 +166,14 @@ pub const SCENES: &[SceneDef] = &[
         None,
         Scene::ReviewConversation,
     ),
+    // the Tasks tab: open and done tasks, and the box for a new one
+    def(
+        "review-tasks",
+        Screen::Review,
+        View::All,
+        None,
+        Scene::ReviewTasks,
+    ),
     // the same in a 900 px window, scrolled to the unplaced comments
     SceneDef {
         size: Some((NARROW_WIDTH, DEFAULT_HEIGHT)),

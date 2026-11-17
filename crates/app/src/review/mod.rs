@@ -19,6 +19,7 @@ pub mod search;
 pub mod selection;
 mod service;
 pub mod split;
+pub mod tasks_ui;
 pub mod types_ui;
 pub mod ui;
 mod worddiff;
@@ -28,5 +29,5 @@ pub use cache::{PatchCache, PATCH_CACHE_BYTES};
 #[allow(unused_imports)]
 pub use service::{
     remember_clones, CommentFetcher, CommitRange, DepsFn, HeadProbe, LastReviewFetcher, ReviewDeps,
-    ReviewEvent, ReviewService, PLAIN_CHANGED_LINES, PREFETCH_RADIUS,
+    ReviewEvent, ReviewService, TaskCreator, PLAIN_CHANGED_LINES, PREFETCH_RADIUS,
 };

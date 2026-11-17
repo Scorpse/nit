@@ -52,6 +52,7 @@ use super::split::{
     comment_target, selected_text_split, split_fits, DiffLayout, SplitMap, SplitSide,
     LAYOUT_META_KEY,
 };
+use super::tasks_ui::Tasks;
 use crate::backend::Backend;
 use crate::demo::DemoReview;
 use crate::list::{reveal_offset, Nav};
@@ -125,6 +126,8 @@ pub struct ReviewScreen {
     pub comments: Comments,
     pub commits: Commits,
     pub tab: Tab,
+    /// The PR's tasks and the one being added (Bitbucket).
+    pub tasks: Tasks,
     /// "Refresh comments" was pressed; the host asks the service, drained each frame.
     comments_refresh: bool,
     /// Drafts, submit, reply and resolve.
@@ -206,6 +209,7 @@ pub enum Tab {
     Diff,
     Conversation,
     Commits,
+    Tasks,
 }
 
 /// What `App` keeps for the review screen.
@@ -230,6 +234,8 @@ pub struct ReviewHost {
     pub(crate) shot_conversation: bool,
     /// Screenshot scene variant: open the Commits tab.
     pub(crate) shot_commits: bool,
+    /// Screenshot scene variant: open the Tasks tab.
+    pub(crate) shot_tasks: bool,
     /// Screenshot scene variant: scroll the Conversation tab to its end.
     pub(crate) shot_conversation_end: bool,
     /// Screenshot scene variant: select a "not in diff" entry once the comments are in.
@@ -265,6 +271,7 @@ mod minimap;
 mod rows;
 mod screen;
 mod selecting;
+mod tasks;
 mod topbar;
 
 use self::commits::*;
@@ -276,6 +283,7 @@ pub use self::keys::*;
 use self::minimap::*;
 use self::rows::*;
 use self::selecting::*;
+use self::tasks::*;
 pub use self::topbar::*;
 
 #[cfg(test)]

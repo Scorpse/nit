@@ -30,7 +30,7 @@ use providers::provider::set_review_checked;
 use crate::lock::lock_ok;
 use crate::review::composer::{CommentPoster, PostError, Poster};
 use crate::review::{
-    CommentFetcher, DepsFn, HeadProbe, LastReviewFetcher, ReviewDeps, ReviewService,
+    CommentFetcher, DepsFn, HeadProbe, LastReviewFetcher, ReviewDeps, ReviewService, TaskCreator,
 };
 
 mod accounts;

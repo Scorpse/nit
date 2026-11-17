@@ -78,6 +78,8 @@ pub enum Scene {
     ReviewConversationEnd,
     /// The review screen on the Commits tab: a commit after my last review is marked new.
     ReviewCommits,
+    /// The review screen on the Tasks tab (Bitbucket).
+    ReviewTasks,
     /// The review screen with a "not in diff" entry selected (comments on a file that is
     /// not in the current diff).
     ReviewOutdated,

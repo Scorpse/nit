@@ -19,7 +19,7 @@ use gitlocal::{
     file_list, file_patch, find_clone, needs_clone, pick_local, ref_prefix, resolve_commits,
     FetchSpec, Git, GitAuth, GitError, GitProgress, LocalClone, LocalRepo, PrRefs, RepoKind,
 };
-use prcore::comments::{build_threads, Thread};
+use prcore::comments::{build_threads, PrTask, Thread};
 use prcore::commit::same_commit_or_unknown;
 use prcore::diff::{apply_counts, parse_patch, DiffFile, FileCounts, Row, RowKind};
 use prcore::history::{CommitInfo, ReviewMark};
@@ -45,6 +45,7 @@ mod loading;
 mod patches;
 mod queue;
 mod shared;
+mod tasks;
 mod types;
 mod workers;
 
@@ -61,4 +62,5 @@ use loading::*;
 use patches::*;
 use queue::*;
 use shared::*;
+use tasks::*;
 use workers::*;

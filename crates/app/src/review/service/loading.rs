@@ -295,18 +295,25 @@ pub(super) fn comment_job(s: &Shared, gen: u64, seq: u64, sess: &Session) {
         (sess.deps.comments)(&sess.repo, sess.pr_id)
     }))
     .unwrap_or_else(|_| Err("internal error".into()));
-    let ev = match fetched {
-        Ok(list) => ReviewEvent::Comments {
-            skipped: list.skipped.len(),
-            threads: build_threads(list.comments),
-        },
-        Err(e) => ReviewEvent::CommentsFailed(format!("Could not load comments ({e})")),
+    let evs = match fetched {
+        Ok(list) => vec![
+            ReviewEvent::Tasks(list.tasks),
+            ReviewEvent::Comments {
+                skipped: list.skipped.len(),
+                threads: build_threads(list.comments),
+            },
+        ],
+        Err(e) => vec![ReviewEvent::CommentsFailed(format!(
+            "Could not load comments ({e})"
+        ))],
     };
     let st = s.lock();
     if st.gen != gen || s.comments_seq.load(Ordering::SeqCst) != seq {
         return;
     }
-    s.send(gen, ev);
+    for ev in evs {
+        s.send(gen, ev);
+    }
     drop(st);
     s.ctx.request_repaint();
 }

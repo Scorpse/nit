@@ -45,6 +45,7 @@ impl ReviewScreen {
             comments: Comments::new(),
             commits: Commits::default(),
             tab: Tab::Diff,
+            tasks: Tasks::default(),
             comments_refresh: false,
             actions: ReviewActions::new(ReviewContext::default()),
             marks_key: None,
@@ -175,6 +176,8 @@ impl ReviewScreen {
                 path,
                 result,
             } => self.commits.set_patch(range, path, result),
+            ReviewEvent::Tasks(list) => self.tasks.set_list(list),
+            ReviewEvent::TaskCreated(result) => self.tasks.created(result),
         }
     }
 

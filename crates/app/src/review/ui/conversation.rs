@@ -10,6 +10,13 @@ pub(super) fn draw_center(ui: &mut Ui, s: &mut ReviewScreen, acts: &mut Vec<Act>
         let n = s.comments.pr_level.len();
         ui.selectable_value(&mut s.tab, Tab::Conversation, format!("Conversation ({n})"));
         ui.selectable_value(&mut s.tab, Tab::Commits, commits_tab_label(&s.commits));
+        if providers::provider::capabilities_for(s.pr.forge).tasks {
+            let label = match s.tasks.open_count() {
+                0 => "Tasks".to_string(),
+                n => format!("Tasks ({n} open)"),
+            };
+            ui.selectable_value(&mut s.tab, Tab::Tasks, label);
+        }
     });
     ui.separator();
     let mut toggles = Vec::new();
@@ -17,6 +24,7 @@ pub(super) fn draw_center(ui: &mut Ui, s: &mut ReviewScreen, acts: &mut Vec<Act>
         Tab::Diff => draw_diff_pane(ui, s, &mut toggles, acts),
         Tab::Conversation => draw_conversation(ui, s, &mut toggles, acts),
         Tab::Commits => draw_commits(ui, s),
+        Tab::Tasks => draw_tasks(ui, s),
     }
     if !toggles.is_empty() {
         // the new heights are laid out on the next frame

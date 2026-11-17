@@ -1323,6 +1323,7 @@ fn one_service_serves_many_opens_with_fresh_deps() {
             probe: Arc::new(move |_, _| Ok(head.clone())),
             comments: no_comments(),
             last_review: Arc::new(|_, _| Ok(None)),
+            create_task: Arc::new(|_, _, _| Err("no".into())),
         })
     });
     let svc = ReviewService::build(
@@ -2037,6 +2038,7 @@ fn open_lists_the_commits_and_reads_my_last_review() {
             probe: Arc::new(move |_, _| Ok(head.clone())),
             comments: no_comments(),
             last_review: Arc::new(move |_, _| Ok(Some(m.clone()))),
+            create_task: Arc::new(|_, _, _| Err("no".into())),
         })
     });
     let svc = ReviewService::build(
@@ -2078,6 +2080,7 @@ fn a_failing_last_review_read_does_not_fail_the_open() {
             probe: Arc::new(move |_, _| Ok(head.clone())),
             comments: no_comments(),
             last_review: Arc::new(|_, _| Err("network error".into())),
+            create_task: Arc::new(|_, _, _| Err("no".into())),
         })
     });
     let svc = ReviewService::build(

@@ -299,6 +299,9 @@ impl ReviewHost {
         if self.shot_conversation_end {
             s.conversation_to_end = true;
         }
+        if self.shot_tasks {
+            s.tab = Tab::Tasks;
+        }
         if self.shot_split {
             s.layout = DiffLayout::Split;
         }
@@ -542,6 +545,9 @@ pub fn show(host: &mut ReviewHost, root: &mut Ui, backend: Option<&Backend>) -> 
         }
         if screen.take_comment_refresh() {
             svc.refresh_comments();
+        }
+        for content in screen.tasks.take_wants() {
+            svc.create_task(content);
         }
     }
     if reload {

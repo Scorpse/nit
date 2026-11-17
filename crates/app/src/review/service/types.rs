@@ -54,6 +54,8 @@ pub type CommentFetcher = Arc<dyn Fn(&RepoRef, u64) -> Result<CommentList, Strin
 /// have none or the forge does not say; errors are category text.
 pub type LastReviewFetcher =
     Arc<dyn Fn(&RepoRef, u64) -> Result<Option<ReviewMark>, String> + Send + Sync>;
+/// Adds a task with this text to the PR (`Provider::create_task()`); errors are category text.
+pub type TaskCreator = Arc<dyn Fn(&RepoRef, u64, &str) -> Result<PrTask, String> + Send + Sync>;
 
 pub(super) type UrlFor = Arc<dyn Fn(&RepoRef) -> String + Send + Sync>;
 
@@ -64,6 +66,7 @@ pub struct ReviewDeps {
     pub probe: HeadProbe,
     pub comments: CommentFetcher,
     pub last_review: LastReviewFetcher,
+    pub create_task: TaskCreator,
 }
 
 /// Called once per open, on the open's thread, with the repository opened (its account's
@@ -81,6 +84,7 @@ pub(super) fn fixed_deps(
         probe,
         comments,
         last_review: Arc::new(|_, _| Ok(None)),
+        create_task: Arc::new(|_, _, _| Err("tasks are not available here".into())),
     });
     Arc::new(move |_: &RepoRef| deps.clone())
 }
@@ -156,6 +160,10 @@ pub enum ReviewEvent {
         path: String,
         result: Result<Arc<String>, String>,
     },
+    /// The PR's tasks, sent just before `Comments`; `None`: not readable (or the forge has none).
+    Tasks(Option<Vec<PrTask>>),
+    /// The answer to `create_task`: the task as the server stored it, or why it was not made.
+    TaskCreated(Result<PrTask, String>),
 }
 
 /// `https://<host>/<namespace>/<slug>.git` on the repository's own host (`bitbucket.org`,
