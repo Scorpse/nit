@@ -844,6 +844,26 @@ impl Provider for BitbucketProvider {
         Ok(values.iter().filter_map(task_of).collect())
     }
 
+    async fn create_task(
+        &self,
+        repo: &RepoRef,
+        id: u64,
+        content: &str,
+    ) -> Result<PrTask, ProviderError> {
+        let v = self
+            .client
+            .post_create(
+                &format!(
+                    "/repositories/{}/{}/pullrequests/{id}/tasks",
+                    repo.namespace, repo.slug
+                ),
+                &serde_json::json!({ "content": { "raw": content } }),
+            )
+            .await?;
+        // The write succeeded; an unreadable echo must not look like a failed post.
+        task_of(&v).ok_or(ProviderError::PostedUnreadable)
+    }
+
     async fn post_comment(
         &self,
         repo: &RepoRef,

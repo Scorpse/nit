@@ -1177,6 +1177,38 @@ async fn tasks_are_decoded_read_only() {
 }
 
 #[tokio::test]
+async fn a_task_is_created_on_the_pr_and_read_back() {
+    let s = MockServer::start().await;
+    Mock::given(method("POST"))
+        .and(path(format!("{PR1}/tasks")))
+        .and(body_json(json!({"content":{"raw":"add a test"}})))
+        .respond_with(ResponseTemplate::new(201).set_body_json(json!({
+            "id":9,"state":"UNRESOLVED","content":{"raw":"add a test"},
+            "creator":{"display_name":"Ada","uuid":"{a}"}})))
+        .expect(1)
+        .mount(&s)
+        .await;
+    let t = provider(&s)
+        .create_task(&repo(), 1, "add a test")
+        .await
+        .unwrap();
+    assert_eq!(t.id, 9);
+    assert_eq!(t.content, "add a test");
+    assert_eq!(t.state, prcore::comments::TaskState::Open);
+}
+
+#[tokio::test]
+async fn a_refused_task_is_an_error() {
+    let s = MockServer::start().await;
+    Mock::given(method("POST"))
+        .and(path(format!("{PR1}/tasks")))
+        .respond_with(ResponseTemplate::new(403))
+        .mount(&s)
+        .await;
+    assert!(provider(&s).create_task(&repo(), 1, "x").await.is_err());
+}
+
+#[tokio::test]
 async fn tasks_failure_does_not_fail_comments() {
     // No tasks endpoint mounted (404): comments still load, tasks are unknown.
     let list = comments_of(vec![entry(1, json!({}))]).await;

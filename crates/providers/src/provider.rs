@@ -288,6 +288,16 @@ pub trait Provider: Send + Sync {
     /// The PR's tasks, read-only (unpublished drafts left out). Only called when
     /// `capabilities().tasks`; a forge without tasks answers `Invalid`.
     async fn tasks(&self, repo: &RepoRef, id: u64) -> Result<Vec<PrTask>, ProviderError>;
+    /// Adds an open task with text `content` to the PR (not tied to a comment) and returns it
+    /// as the server stored it. Only called when `capabilities().tasks`.
+    async fn create_task(
+        &self,
+        _repo: &RepoRef,
+        _id: u64,
+        _content: &str,
+    ) -> Result<PrTask, ProviderError> {
+        Err(ProviderError::Invalid("this forge has no tasks".into()))
+    }
     /// Posts `c` on the revision the user reviewed (`at`, the local fetch). A forge that pins
     /// comments to a commit sends exactly `at`, never "the latest"; Bitbucket anchors to the
     /// current diff and ignores it (guarded by `inline_allowed` before the call).
