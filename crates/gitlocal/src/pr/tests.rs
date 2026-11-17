@@ -1003,6 +1003,66 @@ fn blobless_mirror_lazily_fetches_blobs_with_auth() {
 }
 
 #[test]
+fn merge_check_is_clean_then_lists_the_conflicts_with_their_markers() {
+    use prcore::conflicts::{parse_markers, ConflictKind, Segment};
+    let f = fixture();
+    let refs = fetch(&f, 10, "feature", "main").unwrap();
+    let clean = merge_check(&git(), &f.local_repo, &refs, None).unwrap();
+    assert!(clean.files.is_empty(), "{clean:?}");
+
+    // main now changes what the PR changed: a line the PR edited, and a file the PR deleted
+    let r = f.remote.path();
+    let m = lines("mod", 10).replace(
+        "mod line 3
+",
+        "mod line 3 on main
+",
+    );
+    std::fs::write(r.join("mod.txt"), m).unwrap();
+    std::fs::write(
+        r.join("del.txt"),
+        lines("del", 5)
+            + "more
+",
+    )
+    .unwrap();
+    commit_all(r, "main edits");
+    let refs = fetch(&f, 11, "feature", "main").unwrap();
+    let report = merge_check(&git(), &f.local_repo, &refs, None).unwrap();
+    let got: Vec<_> = report
+        .files
+        .iter()
+        .map(|c| (c.path.as_str(), c.kind))
+        .collect();
+    assert_eq!(
+        got,
+        [
+            ("del.txt", ConflictKind::DeletedInPr),
+            ("mod.txt", ConflictKind::Content)
+        ]
+    );
+    let text = file_text(&git(), &f.local_repo, &report.tree, "mod.txt", None).unwrap();
+    let hunk = parse_markers(&text)
+        .into_iter()
+        .find_map(|s| match s {
+            Segment::Conflict(h) => Some(h),
+            Segment::Context(_) => None,
+        })
+        .expect("a conflict hunk");
+    assert_eq!(hunk.ours, ["mod line 3 on main"], "the destination is ours");
+    assert_eq!(hunk.theirs, ["mod line 3 changed"], "the PR is theirs");
+
+    let bad = PrRefs {
+        dest: "--all".into(),
+        ..refs
+    };
+    assert!(matches!(
+        merge_check(&git(), &f.local_repo, &bad, None),
+        Err(GitError::InvalidRef(_))
+    ));
+}
+
+#[test]
 fn commit_log_lists_the_prs_own_commits_oldest_first() {
     let f = fixture();
     let r = f.remote.path();

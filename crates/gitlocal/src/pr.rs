@@ -3,6 +3,7 @@
 
 use crate::runner::{Git, GitAuth, GitError, RunOpts, LAZY_FETCH_TIMEOUT, NETWORK_TIMEOUT};
 use crate::{validate_url, LocalRepo};
+use prcore::conflicts::{parse_merge_tree, ConflictReport};
 use prcore::diff::{
     parse_diff_index, parse_diff_raw, parse_numstat, DiffFile, FileCounts, FileStatus,
 };
@@ -231,6 +232,9 @@ pub fn commit_log(
     )?;
     Ok(parse_log(&out))
 }
+
+/// The list of conflicted files git may print.
+const MAX_MERGE_CHECK_BYTES: usize = 4 * 1024 * 1024;
 
 const DIFF_COMMON: [&str; 4] = ["-M", "--no-ext-diff", "--no-textconv", "--no-color"];
 
@@ -675,6 +679,40 @@ fn attribute(out: &[u8], wanted: &[&DiffFile]) -> Vec<Option<String>> {
             }
         })
         .collect()
+}
+
+/// Trial-merges the PR's head into the destination (`git merge-tree`: no work tree, no ref
+/// moves; it writes the merged objects, which nothing refers to). The report lists the
+/// conflicted files; `report.tree` holds each with its conflict markers (read one with
+/// `file_text`). Needs git 2.38. A blobless mirror may fetch the blobs it needs.
+pub fn merge_check(
+    git: &Git,
+    local: &LocalRepo,
+    refs: &PrRefs,
+    auth: Option<&GitAuth>,
+) -> Result<ConflictReport, GitError> {
+    validate_operand("revision", &refs.dest)?;
+    validate_operand("revision", &refs.head)?;
+    let opts = RunOpts {
+        auth,
+        max_bytes: Some(MAX_MERGE_CHECK_BYTES),
+        timeout: Some(LAZY_FETCH_TIMEOUT),
+        ok_code: Some(1),
+        ..RunOpts::default()
+    };
+    let out = git.run_with(
+        &local.path,
+        &[
+            "merge-tree",
+            "--write-tree",
+            "-z",
+            "--no-messages",
+            &refs.dest,
+            &refs.head,
+        ],
+        opts,
+    )?;
+    parse_merge_tree(&out).ok_or_else(|| GitError::Io("unexpected merge-tree output".into()))
 }
 
 /// Contents of `path` at `rev` (`git show rev:path`), lossy-decoded.

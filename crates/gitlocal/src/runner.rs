@@ -635,6 +635,7 @@ impl Git {
             opts.timeout,
             opts.cancel,
             opts.progress,
+            opts.ok_code,
         )
     }
 
@@ -694,6 +695,9 @@ pub(crate) struct RunOpts<'a> {
     pub cancel: Option<Cancel<'a>>,
     /// Receives the progress lines of stderr (the command must ask git for `--progress`).
     pub progress: Option<Progress<'a>>,
+    /// An exit code, besides 0, that is an answer and not a failure (`git merge-tree` exits 1
+    /// for a merge that conflicts).
+    pub ok_code: Option<i32>,
 }
 
 /// A cancel check: true once the work git does is no longer wanted.
@@ -803,7 +807,7 @@ pub(crate) fn execute(
     timeout: Option<Duration>,
     cancel: Option<Cancel<'_>>,
 ) -> Result<Vec<u8>, GitError> {
-    execute_reporting(cmd, auth, max_bytes, timeout, cancel, None)
+    execute_reporting(cmd, auth, max_bytes, timeout, cancel, None, None)
 }
 
 /// Like `execute`; progress lines of stderr are also parsed and handed to `progress` on
@@ -815,6 +819,7 @@ pub(crate) fn execute_reporting(
     timeout: Option<Duration>,
     cancel: Option<Cancel<'_>>,
     progress: Option<Progress<'_>>,
+    ok_code: Option<i32>,
 ) -> Result<Vec<u8>, GitError> {
     use std::io::Read;
     // work that is no longer wanted is not started: the cancel check used to be asked only
@@ -930,7 +935,7 @@ pub(crate) fn execute_reporting(
     let err_bytes = err_thread.join().unwrap_or_default();
     report();
     read.map_err(io)?;
-    if status.success() {
+    if status.success() || (ok_code.is_some() && status.code() == ok_code) {
         Ok(buf)
     } else {
         Err(GitError::Failed {
