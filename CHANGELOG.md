@@ -13,6 +13,7 @@ While the version is below 1.0, minor versions may contain breaking changes.
 - Review screen: a Commits tab lists the pull request's commits, newest first, marking those after your last review as new. Choose a commit, or "All N new, together", to see its files and diff (read only). Your last review is the exact reviewed commit on GitHub; on Bitbucket and GitLab it is the time of your last activity.
 - Inbox: a "new commits" pill on pull requests you opened in nit whose head moved since you were last caught up.
 - Inbox pills: white text on red for changes requested and conflicts, a darker readable green for approved and checks passed, and the size-limit badge in warning amber.
+- Bitbucket: a Tasks tab in the review screen lists the pull request's tasks (open first, with who made them) and adds a new task.
 
 ## [0.1.2] - 2026-11-16
 
