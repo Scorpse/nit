@@ -86,7 +86,7 @@ fn range_refs(sess: &Session, range: &CommitRange) -> PrRefs {
 }
 
 /// Git credentials, needed only when the repository is a blobless mirror that fetches blobs.
-fn range_auth<'a>(s: &Shared, sess: &'a Session) -> Option<&'a GitAuth> {
+pub(super) fn range_auth<'a>(s: &Shared, sess: &'a Session) -> Option<&'a GitAuth> {
     match s.source {
         Source::Remote(_) => sess.deps.auth.as_ref(),
         Source::Local(_) => None,

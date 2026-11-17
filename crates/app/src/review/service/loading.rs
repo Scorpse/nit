@@ -361,6 +361,7 @@ pub(super) fn open_job(s: &Arc<Shared>, gen: u64, repo: RepoRef, pr: PullRequest
             s.ctx.request_repaint();
             spawn_comment_fetch(s, gen, sess.clone());
             spawn_commit_info(s, gen, sess.clone());
+            spawn_conflict_check(s, gen, sess.clone());
             // the inbox copy (no network) or the server (probe) has a different head
             if !same_commit_or_unknown(&pr.source_commit, &sess.refs.head) || probe_moved(&sess) {
                 s.emit(gen, ReviewEvent::Stale);

@@ -227,6 +227,19 @@ impl ReviewService {
         self.shared.work.notify_all();
     }
 
+    /// Reads the merged text of conflicted `path` from the trial merge `tree` (answered by
+    /// `ConflictText`).
+    pub fn request_conflict_text(&self, tree: String, path: String) {
+        let (gen, sess) = {
+            let st = self.shared.lock();
+            match &st.session {
+                Some(sess) => (st.gen, sess.clone()),
+                None => return,
+            }
+        };
+        spawn_conflict_text(&self.shared, gen, sess, tree, path);
+    }
+
     /// Lists the files changed in `range` (answered by `RangeFiles`).
     pub fn request_range_files(&self, range: CommitRange) {
         let (gen, sess) = {

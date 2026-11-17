@@ -16,11 +16,13 @@ use std::time::{Duration, Instant};
 use eframe::egui;
 use gitlocal::{
     batch_patches_cancellable, commit_log, discover_clones, fetch_pr, file_counts, file_index,
-    file_list, file_patch, find_clone, needs_clone, pick_local, ref_prefix, resolve_commits,
-    FetchSpec, Git, GitAuth, GitError, GitProgress, LocalClone, LocalRepo, PrRefs, RepoKind,
+    file_list, file_patch, file_text, find_clone, merge_check, needs_clone, pick_local, ref_prefix,
+    resolve_commits, FetchSpec, Git, GitAuth, GitError, GitProgress, LocalClone, LocalRepo, PrRefs,
+    RepoKind,
 };
 use prcore::comments::{build_threads, PrTask, Thread};
 use prcore::commit::same_commit_or_unknown;
+use prcore::conflicts::ConflictReport;
 use prcore::diff::{apply_counts, parse_patch, DiffFile, FileCounts, Row, RowKind};
 use prcore::history::{CommitInfo, ReviewMark};
 use prcore::model::{Forge, PrState, PullRequest, RepoRef};
@@ -40,6 +42,7 @@ use crate::settings_ui::default_download_dir;
 mod api;
 mod clones;
 mod commits;
+mod conflicts;
 mod highlights;
 mod loading;
 mod patches;
@@ -57,6 +60,7 @@ pub use clones::*;
 pub use types::*;
 
 use commits::*;
+use conflicts::*;
 use highlights::*;
 use loading::*;
 use patches::*;

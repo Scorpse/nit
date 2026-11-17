@@ -302,6 +302,9 @@ impl ReviewHost {
         if self.shot_tasks {
             s.tab = Tab::Tasks;
         }
+        if self.shot_conflicts {
+            crate::demo::shot_conflicts(s);
+        }
         if self.shot_split {
             s.layout = DiffLayout::Split;
         }
@@ -396,7 +399,9 @@ pub fn show(host: &mut ReviewHost, root: &mut Ui, backend: Option<&Backend>) -> 
     // the scene picks a modified text file: wait for numstat's binary flags
     let counted =
         screen.counts_error.is_some() || screen.files.as_ref().is_some_and(|l| l.counts_known());
-    if host.shot_scene && counted {
+    // the conflicts scene waits for the real trial merge, which it then replaces
+    let merged = !host.shot_conflicts || screen.conflicts.report.is_some();
+    if host.shot_scene && counted && merged {
         host.shot_setup();
     }
     let shot_commits = host.shot_commits;
@@ -548,6 +553,9 @@ pub fn show(host: &mut ReviewHost, root: &mut Ui, backend: Option<&Backend>) -> 
         }
         for content in screen.tasks.take_wants() {
             svc.create_task(content);
+        }
+        for (tree, path) in screen.conflicts.take_wants() {
+            svc.request_conflict_text(tree, path);
         }
     }
     if reload {

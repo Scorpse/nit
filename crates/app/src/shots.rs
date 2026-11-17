@@ -166,6 +166,14 @@ pub const SCENES: &[SceneDef] = &[
         None,
         Scene::ReviewConversation,
     ),
+    // merge conflicts: the banner over the tabs, the Conflicts tab and a marked file
+    def(
+        "review-conflicts",
+        Screen::Review,
+        View::All,
+        None,
+        Scene::ReviewConflicts,
+    ),
     // the Tasks tab: open and done tasks, and the box for a new one
     def(
         "review-tasks",

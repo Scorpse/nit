@@ -1202,8 +1202,9 @@ fn small_pr_is_prefetched_whole_with_one_git_process() {
     let (_, files) = open_and_wait(&svc, &f);
     wait_for("whole PR", || files.iter().all(|d| svc.is_cached(&d.path)));
     std::thread::sleep(Duration::from_millis(300));
-    // refs (1), merge-base (1), file list (2), commit log (1), then every patch of the PR (1)
-    assert_eq!(git.spawn_count(), 6);
+    // refs (1), merge-base (1), file list (2), commit log (1), the trial merge (1), then every
+    // patch of the PR (1)
+    assert_eq!(git.spawn_count(), 7);
     assert_eq!(svc.patches_built(), 0);
     assert!(svc.batches_run() >= 1);
     // browsing now needs no git at all
@@ -1217,7 +1218,7 @@ fn small_pr_is_prefetched_whole_with_one_git_process() {
         .iter()
         .any(|e| matches!(e, ReviewEvent::PatchFailed { .. })));
     std::thread::sleep(Duration::from_millis(300));
-    assert_eq!(git.spawn_count(), 6);
+    assert_eq!(git.spawn_count(), 7);
 }
 
 #[test]
@@ -2165,4 +2166,24 @@ fn a_bad_range_is_an_error_not_a_crash() {
     assert!(evs
         .iter()
         .any(|e| matches!(e, ReviewEvent::RangeFiles { result: Err(_), .. })));
+}
+
+#[test]
+fn opening_a_pr_reports_that_it_merges_cleanly() {
+    let f = review_fixture();
+    let svc = local(&f);
+    let evs = {
+        svc.open(f.repo.clone(), f.pr.clone());
+        collect_until(&svc, |e| {
+            e.iter().any(|x| matches!(x, ReviewEvent::Conflicts(_)))
+        })
+    };
+    let report = evs
+        .iter()
+        .find_map(|e| match e {
+            ReviewEvent::Conflicts(r) => Some(r.clone()),
+            _ => None,
+        })
+        .expect("the trial merge answered");
+    assert!(report.expect("it ran").files.is_empty());
 }

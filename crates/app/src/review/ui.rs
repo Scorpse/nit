@@ -33,6 +33,7 @@ use super::composer::{
     editor_widget, reply_widgets, thread_buttons, toast, Act, Composer, MemoryPoster, Poster, Slot,
     Target,
 };
+use super::conflicts_ui::Conflicts;
 use super::diffview::{
     minimap_ticks, styled_columns, tick_at, DiffCursor, DiffView, FileView, Offsets, Tick,
     TickKind, ROW_H,
@@ -128,6 +129,8 @@ pub struct ReviewScreen {
     pub tab: Tab,
     /// The PR's tasks and the one being added (Bitbucket).
     pub tasks: Tasks,
+    /// Whether the PR merges into its destination, and the conflicted files.
+    pub conflicts: Conflicts,
     /// "Refresh comments" was pressed; the host asks the service, drained each frame.
     comments_refresh: bool,
     /// Drafts, submit, reply and resolve.
@@ -210,6 +213,7 @@ pub enum Tab {
     Conversation,
     Commits,
     Tasks,
+    Conflicts,
 }
 
 /// What `App` keeps for the review screen.
@@ -236,6 +240,8 @@ pub struct ReviewHost {
     pub(crate) shot_commits: bool,
     /// Screenshot scene variant: open the Tasks tab.
     pub(crate) shot_tasks: bool,
+    /// Screenshot scene variant: open the Conflicts tab with sample conflicts.
+    pub(crate) shot_conflicts: bool,
     /// Screenshot scene variant: scroll the Conversation tab to its end.
     pub(crate) shot_conversation_end: bool,
     /// Screenshot scene variant: select a "not in diff" entry once the comments are in.
@@ -262,6 +268,7 @@ pub struct ReviewHost {
 }
 
 mod commits;
+mod conflicts;
 mod conversation;
 mod diffpane;
 mod filelist;
@@ -275,6 +282,7 @@ mod tasks;
 mod topbar;
 
 use self::commits::*;
+use self::conflicts::*;
 use self::conversation::*;
 use self::diffpane::*;
 use self::filelist::*;

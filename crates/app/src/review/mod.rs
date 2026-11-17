@@ -9,6 +9,7 @@ pub mod columns;
 pub mod comments_ui;
 pub mod commits_ui;
 pub mod composer;
+pub mod conflicts_ui;
 pub mod diffview;
 pub mod export_ui;
 pub mod files;
