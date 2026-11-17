@@ -1,5 +1,4 @@
 use super::*;
-use chrono::TimeZone;
 use prcore::comments::build_threads;
 use std::time::Duration;
 
@@ -380,7 +379,7 @@ fn empty_draft_not_saved() {
 }
 
 fn comment(id: u64, resolved: bool) -> Comment {
-    let t = chrono::Utc.timestamp_opt(1_700_000_000, 0).unwrap();
+    let t = jiff::Timestamp::from_second(1_700_000_000).unwrap();
     Comment {
         id: id.into(),
         parent_id: None,

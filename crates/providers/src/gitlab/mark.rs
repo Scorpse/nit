@@ -1,7 +1,7 @@
 //! My last review of an MR, from the newest note I wrote on it: a comment or reply, or the
 //! system note GitLab adds for an approval. GitLab gives a time, not a commit.
 
-use chrono::{DateTime, Utc};
+use jiff::Timestamp;
 use prcore::history::ReviewMark;
 use serde_json::Value;
 
@@ -13,9 +13,7 @@ pub(super) fn mark_of(notes: &Value, me: &str) -> Option<ReviewMark> {
             .as_u64()
             .is_some_and(|id| id.to_string() == me)
     })?;
-    let at = DateTime::parse_from_rfc3339(mine["created_at"].as_str()?)
-        .ok()?
-        .with_timezone(&Utc);
+    let at = mine["created_at"].as_str()?.parse::<Timestamp>().ok()?;
     Some(ReviewMark { at, commit: None })
 }
 
@@ -32,7 +30,7 @@ mod tests {
             {"author": {"id": 7}, "created_at": "2026-11-13T12:00:00.000Z"}
         ]);
         let m = mark_of(&notes, "7").unwrap();
-        assert_eq!(m.at.to_rfc3339(), "2026-11-14T12:00:00.500+00:00");
+        assert_eq!(m.at.to_string(), "2026-11-14T12:00:00.5Z");
         assert_eq!(m.commit, None);
     }
 

@@ -1,6 +1,6 @@
 //! My last review of a PR, from GitHub's `viewerLatestReview`.
 
-use chrono::{DateTime, Utc};
+use jiff::Timestamp;
 use prcore::history::ReviewMark;
 use prcore::model::RepoRef;
 use serde_json::{json, Value};
@@ -25,9 +25,7 @@ fn mark_of(review: &Value) -> Option<ReviewMark> {
     if review["state"].as_str()? == "PENDING" {
         return None;
     }
-    let at = DateTime::parse_from_rfc3339(review["submittedAt"].as_str()?)
-        .ok()?
-        .with_timezone(&Utc);
+    let at = review["submittedAt"].as_str()?.parse::<Timestamp>().ok()?;
     let commit = review["commit"]["oid"].as_str().map(str::to_string);
     Some(ReviewMark { at, commit })
 }
@@ -43,7 +41,7 @@ mod tests {
             "commit": {"oid": "7094b61de42571afe2541aba7aed7d9fe2b41846"}}),
         )
         .unwrap();
-        assert_eq!(m.at.to_rfc3339(), "2026-11-14T00:02:51+00:00");
+        assert_eq!(m.at.to_string(), "2026-11-14T00:02:51Z");
         assert_eq!(
             m.commit.as_deref(),
             Some("7094b61de42571afe2541aba7aed7d9fe2b41846")

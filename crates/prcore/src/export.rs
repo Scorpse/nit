@@ -146,7 +146,7 @@ struct Item<'a> {
 impl Item<'_> {
     fn order(&self) -> (u8, i64, CommentId) {
         match &self.body {
-            Body::Thread(t, _) => (0, t.root.created_on.timestamp(), t.root.id.clone()),
+            Body::Thread(t, _) => (0, t.root.created_on.as_second(), t.root.id.clone()),
             Body::Draft(d, _) => (1, 0, CommentId::from(d.id.max(0) as u64)),
         }
     }

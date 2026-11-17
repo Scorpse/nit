@@ -380,7 +380,7 @@ pub(super) fn pr_row(pr: &PullRequest) -> StoreResult<PrRow> {
     Ok((
         pr.id as i64,
         state,
-        pr.updated_on.to_rfc3339(),
+        pr.updated_on.to_string(),
         serde_json::to_string(pr)?,
     ))
 }

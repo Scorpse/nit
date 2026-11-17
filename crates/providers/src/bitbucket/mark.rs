@@ -1,7 +1,7 @@
 //! My last review of a PR, from the `participated_on` time of my own entry among the PR's
 //! participants. Bitbucket gives a time, not a commit.
 
-use chrono::{DateTime, Utc};
+use jiff::Timestamp;
 use prcore::history::ReviewMark;
 use serde_json::Value;
 
@@ -13,9 +13,10 @@ pub(super) fn mark_of(pr: &Value, me: &str) -> Option<ReviewMark> {
         .as_array()?
         .iter()
         .find(|p| p["user"]["uuid"].as_str() == Some(me))?;
-    let at = DateTime::parse_from_rfc3339(mine["participated_on"].as_str()?)
-        .ok()?
-        .with_timezone(&Utc);
+    let at = mine["participated_on"]
+        .as_str()?
+        .parse::<Timestamp>()
+        .ok()?;
     Some(ReviewMark { at, commit: None })
 }
 
@@ -36,7 +37,7 @@ mod tests {
     #[test]
     fn my_participation_time_is_the_mark() {
         let m = mark_of(&pr(), "{me}").unwrap();
-        assert_eq!(m.at.to_rfc3339(), "2026-11-12T09:30:00.123456+00:00");
+        assert_eq!(m.at.to_string(), "2026-11-12T09:30:00.123456Z");
         assert_eq!(m.commit, None);
     }
 

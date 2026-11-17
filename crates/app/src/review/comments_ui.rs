@@ -874,7 +874,7 @@ pub fn paint_card(
             );
             name = tag.expand2(eframe::egui::vec2(3.0, 0.0));
         }
-        let mut when = c.created_on.format("%Y-%m-%d %H:%M").to_string();
+        let mut when = c.created_on.strftime("%Y-%m-%d %H:%M").to_string();
         if c.updated_on != c.created_on && !c.deleted {
             when.push_str(" (edited)");
         }

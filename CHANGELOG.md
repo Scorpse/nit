@@ -8,6 +8,8 @@ While the version is below 1.0, minor versions may contain breaking changes.
 
 ## [Unreleased]
 
+- Replaced the unmaintained `chrono` crate with `jiff` (RUSTSEC-2026-0543); dates and times look the same.
+
 ## [0.1.3] - 2026-11-17
 
 - Every open pull request in the inbox now shows an "approved" pill once approved (nothing when not), and the detail pane has an Approval row naming who approved or asked for changes.

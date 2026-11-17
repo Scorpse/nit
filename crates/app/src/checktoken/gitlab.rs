@@ -8,8 +8,8 @@
 //! host, 8 system git, 9 HTTPS reach of the API. API and git TLS are reported separately
 //! (9 and 7): git has its own certificate settings.
 
-use chrono::NaiveDate;
 use gitlocal::GITLAB_GIT_USER;
+use jiff::civil::Date;
 use prcore::model::{Forge, PrState, RepoRef};
 use providers::gitlab::{GitLabBases, GitLabProvider, TokenInfo};
 use providers::{Provider, ProviderError};
@@ -73,8 +73,8 @@ fn skip(r: &mut Report, n: u8, detail: impl Into<String>) {
 
 /// A warning when the token expires within `EXPIRY_WARNING_DAYS` of `today` (or already
 /// did); None for a token without expiry or one that lasts longer.
-pub fn expiry_warning(expires: Option<NaiveDate>, today: NaiveDate) -> Option<String> {
-    let days = (expires? - today).num_days();
+pub fn expiry_warning(expires: Option<Date>, today: Date) -> Option<String> {
+    let days = i64::from((expires? - today).get_days());
     match days {
         d if d < 0 => Some(format!("the token expired on {}", expires?)),
         0 => Some("the token expires today".into()),
@@ -178,7 +178,7 @@ pub struct Inputs<'a> {
     pub git: &'a dyn GitSide,
     pub proxy_var: Option<&'static str>,
     /// Today's date, for the expiry warning.
-    pub today: NaiveDate,
+    pub today: Date,
 }
 
 const HINT_TOKEN: &str = "create a new personal access token with the read_api and \
@@ -400,7 +400,7 @@ pub async fn run(inp: &Inputs<'_>, token: Result<(String, Source), String>) -> R
     r
 }
 
-fn check_token_info(r: &mut Report, info: &TokenInfo, today: NaiveDate) {
+fn check_token_info(r: &mut Report, info: &TokenInfo, today: Date) {
     if !info.active {
         return fail(
             r,

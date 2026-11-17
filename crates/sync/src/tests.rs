@@ -1,6 +1,5 @@
 use super::*;
 use async_trait::async_trait;
-use chrono::{TimeZone, Utc};
 use prcore::comments::{Comment, NewComment, PrTask, ReviewAction, ThreadId};
 use prcore::model::RepoInfo;
 use prcore::model::{DiffStat, PrState, PullRequest, UserRef};
@@ -44,7 +43,7 @@ fn pr(r: &RepoRef, id: u64, state: PrState, commit: &str) -> PullRequest {
         display_name: "U".into(),
         login: None,
     };
-    let t = Utc.with_ymd_and_hms(2026, 1, 1, 0, 0, 0).unwrap();
+    let t = "2026-01-01T00:00:00Z".parse().unwrap();
     PullRequest {
         repo: r.clone(),
         id,

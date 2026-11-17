@@ -1,8 +1,7 @@
 use super::*;
-use chrono::TimeZone;
 
-fn at(h: u32) -> DateTime<Utc> {
-    Utc.with_ymd_and_hms(2026, 11, 16, h, 0, 0).unwrap()
+fn at(h: u32) -> Timestamp {
+    format!("2026-11-16T{h:02}:00:00Z").parse().unwrap()
 }
 
 fn commit(id: &str, h: u32) -> CommitInfo {
@@ -23,7 +22,7 @@ fn log_entries_are_parsed_and_a_broken_one_is_skipped() {
     assert_eq!(got.len(), 2);
     assert_eq!(got[0].id, "aaaa");
     assert_eq!(got[0].author, "Ada Lovelace");
-    assert_eq!(got[0].date, at(7) + chrono::Duration::minutes(30));
+    assert_eq!(got[0].date, at(7) + jiff::SignedDuration::from_mins(30));
     assert_eq!(
         got[0].subject, "Fix: a | b\u{1f}x",
         "the subject keeps what follows"

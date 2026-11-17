@@ -258,8 +258,10 @@ fn paused_status_shown_per_account() {
             .find(|(id, _)| *id == o.id)
             .map(|(_, t)| t);
     }
-    let hhmm = chrono::DateTime::<chrono::Local>::from(until)
-        .format("%H:%M")
+    let hhmm = jiff::Timestamp::try_from(until)
+        .unwrap()
+        .to_zoned(jiff::tz::TimeZone::system())
+        .strftime("%H:%M")
         .to_string();
     let (text, tone) = crate::settings_ui::other_account_status(&others[0]);
     assert_eq!(text, format!("Paused by the rate limit until {hhmm}"));
@@ -684,7 +686,7 @@ fn a_gitlab_account_stores_only_its_token_and_its_derived_bases() {
         display_name: "Alex".into(),
         login: Some("alex".into()),
     };
-    let expires = chrono::NaiveDate::from_ymd_opt(2027, 1, 31);
+    let expires = jiff::civil::Date::new(2027, 1, 31).ok();
     let (id, name) = add_gitlab(&secrets, &store, &bases, "glpat-tok", &me, expires).unwrap();
     assert_eq!(name, "alex (git.corp.example/gitlab)");
     assert_eq!(
@@ -721,10 +723,10 @@ fn gitlab_signin_errors_and_summary_never_carry_the_token() {
     assert!(text.contains("did not accept"), "{text}");
     let info = providers::gitlab::TokenInfo {
         scopes: vec!["read_api".into(), "read_repository".into()],
-        expires_at: chrono::NaiveDate::from_ymd_opt(2026, 11, 20),
+        expires_at: jiff::civil::Date::new(2026, 11, 20).ok(),
         active: true,
     };
-    let today = chrono::NaiveDate::from_ymd_opt(2026, 11, 14).unwrap();
+    let today = jiff::civil::Date::new(2026, 11, 14).unwrap();
     let s = gitlab_token_summary("alex", &info, today, "3 projects visible");
     assert!(s.contains("Signed in as alex"), "{s}");
     assert!(s.contains("expires in 6 day(s)"), "{s}");

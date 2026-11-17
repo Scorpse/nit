@@ -1,7 +1,7 @@
 use super::*;
 use crate::comments::Anchor;
 use crate::model::{PrState, RepoRef};
-use chrono::{TimeZone, Utc};
+use jiff::Timestamp;
 
 fn user(n: &str) -> UserRef {
     UserRef {
@@ -12,7 +12,7 @@ fn user(n: &str) -> UserRef {
 }
 
 fn pr() -> PullRequest {
-    let t = Utc.timestamp_opt(1_700_000_000, 0).unwrap();
+    let t = Timestamp::from_second(1_700_000_000).unwrap();
     let repo = RepoRef::parse_bitbucket("acme/api").unwrap();
     PullRequest {
         repo: repo.clone(),
@@ -44,7 +44,7 @@ fn pr() -> PullRequest {
 }
 
 fn comment(id: u64, parent: Option<u64>, who: &str, body: &str) -> Comment {
-    let t = Utc.timestamp_opt(1_700_000_000 + id as i64, 0).unwrap();
+    let t = Timestamp::from_second(1_700_000_000 + id as i64).unwrap();
     Comment {
         id: id.into(),
         parent_id: parent.map(Into::into),

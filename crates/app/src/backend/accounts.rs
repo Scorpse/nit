@@ -142,12 +142,12 @@ pub(super) fn expiry_key(id: &AccountId) -> String {
 }
 
 /// When `id`'s token expires, as recorded at sign-in (GitLab only).
-pub fn token_expiry(store: &Store, id: &AccountId) -> Option<chrono::NaiveDate> {
+pub fn token_expiry(store: &Store, id: &AccountId) -> Option<jiff::civil::Date> {
     store
         .get_meta(&expiry_key(id))
         .ok()
         .flatten()
-        .and_then(|d| chrono::NaiveDate::parse_from_str(&d, "%Y-%m-%d").ok())
+        .and_then(|d| d.parse::<jiff::civil::Date>().ok())
 }
 
 /// Stores a checked GitLab sign-in as a new account: the token only (read back), then the
@@ -159,7 +159,7 @@ pub(super) fn add_gitlab(
     bases: &GitLabBases,
     token: &str,
     me: &UserRef,
-    expires: Option<chrono::NaiveDate>,
+    expires: Option<jiff::civil::Date>,
 ) -> Result<(AccountId, String), String> {
     let existing = lock_ok(store).accounts().unwrap_or_default();
     let duplicate = existing
@@ -193,7 +193,7 @@ pub(super) fn add_gitlab(
         return Err("Could not save the account".into());
     }
     if let Some(d) = expires {
-        let _ = lock_ok(store).set_meta(&expiry_key(&id), &d.format("%Y-%m-%d").to_string());
+        let _ = lock_ok(store).set_meta(&expiry_key(&id), &d.to_string());
     }
     Ok((id, format!("{shown} ({})", bases.git_host)))
 }
@@ -216,7 +216,7 @@ pub(super) fn gitlab_signin_error(e: &ProviderError) -> String {
 pub(super) fn gitlab_token_summary(
     who: &str,
     info: &TokenInfo,
-    today: chrono::NaiveDate,
+    today: jiff::civil::Date,
     repos: &str,
 ) -> String {
     use crate::checktoken::gitlab::{expiry_warning, scope_note};
@@ -240,7 +240,7 @@ pub(super) async fn gitlab_connection_summary(p: &GitLabProvider) -> Result<Stri
         Err(e) => format!("listing projects failed: {}", e.user_message()),
     };
     let who = me.login.unwrap_or(me.display_name);
-    let today = chrono::Local::now().date_naive();
+    let today = jiff::Zoned::now().date();
     Ok(match p.token_info().await {
         Ok(info) => gitlab_token_summary(&who, &info, today, &repos),
         Err(e) => format!(

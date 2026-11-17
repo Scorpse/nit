@@ -680,7 +680,7 @@ pub fn show_detail(ui: &mut Ui, d: &Detail) {
                     }
                     ui.end_row();
                     ui.label(egui::RichText::new("Updated").color(GREY));
-                    ui.label(pr.updated_on.format("%Y-%m-%d %H:%M UTC").to_string());
+                    ui.label(pr.updated_on.strftime("%Y-%m-%d %H:%M UTC").to_string());
                     ui.end_row();
                     ui.label(egui::RichText::new("Size").color(GREY));
                     match &d.stat {

@@ -1,5 +1,4 @@
 use super::*;
-use chrono::{TimeZone, Utc};
 use prcore::model::{PrState, ReviewState, Reviewer, UserRef};
 
 impl Store {
@@ -54,8 +53,8 @@ fn pr(r: &RepoRef, id: u64, state: PrState) -> PullRequest {
                 state: ReviewState::ChangesRequested,
             },
         ],
-        created_on: Utc.with_ymd_and_hms(2026, 1, 2, 3, 4, 5).unwrap(),
-        updated_on: Utc.with_ymd_and_hms(2026, 2, 3, 4, 5, 6).unwrap(),
+        created_on: "2026-01-02T03:04:05Z".parse().unwrap(),
+        updated_on: "2026-02-03T04:05:06Z".parse().unwrap(),
         forge: Default::default(),
         account: Default::default(),
         web_url: String::new(),
@@ -409,7 +408,7 @@ fn migration_from_v1_keeps_existing_data() {
             "INSERT INTO prs (repo, id, state, updated_on, json) VALUES (?1, 1, 'OPEN', ?2, ?3)",
             params![
                 "acme/api",
-                p.updated_on.to_rfc3339(),
+                p.updated_on.to_string(),
                 serde_json::to_string(&p).unwrap()
             ],
         )
@@ -540,7 +539,7 @@ fn v4_cache(path: &Path, with_prs: &[RepoRef]) {
                 params![
                     r.full_name(),
                     id as i64,
-                    p.updated_on.to_rfc3339(),
+                    p.updated_on.to_string(),
                     serde_json::to_string(&p).unwrap()
                 ],
             )

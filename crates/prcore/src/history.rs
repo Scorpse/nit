@@ -1,7 +1,7 @@
 //! A PR's commits and the point of my last review: which commits are new since then.
 
 use crate::commit::same_commit;
-use chrono::{DateTime, Utc};
+use jiff::Timestamp;
 
 /// One commit of a PR, as `git log` lists it.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -10,7 +10,7 @@ pub struct CommitInfo {
     pub id: String,
     pub author: String,
     /// Committer date: when it landed, which a rebase moves.
-    pub date: DateTime<Utc>,
+    pub date: Timestamp,
     /// First line of the message.
     pub subject: String,
 }
@@ -19,7 +19,7 @@ pub struct CommitInfo {
 /// was made on.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReviewMark {
-    pub at: DateTime<Utc>,
+    pub at: Timestamp,
     pub commit: Option<String>,
 }
 
@@ -50,7 +50,7 @@ pub fn parse_log(raw: &[u8]) -> Vec<CommitInfo> {
             Some(CommitInfo {
                 id: id.to_string(),
                 author: author.to_string(),
-                date: DateTime::parse_from_rfc3339(date).ok()?.with_timezone(&Utc),
+                date: date.parse::<Timestamp>().ok()?,
                 subject: subject.to_string(),
             })
         })

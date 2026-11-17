@@ -26,7 +26,7 @@ keyring = { version = "3", features = ["apple-native"] }
 keyring = { version = "3", features = ["sync-secret-service", "crypto-rust"] }
 
 [dev-dependencies]
-chrono = { version = "0.4", features = ["serde"] }
+jiff = { version = "0.2", features = ["serde"] }
 tempfile = "3"
 
 [lints]

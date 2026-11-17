@@ -1,13 +1,13 @@
 use super::*;
 use crate::model::UserRef;
-use chrono::{TimeZone, Utc};
+use jiff::Timestamp;
 
 fn repo(name: &str) -> RepoRef {
     RepoRef::parse_bitbucket(name).unwrap()
 }
 
 fn pr(repo_name: &str, id: u64, src: &str, dst: &str, state: PrState) -> PullRequest {
-    let t = Utc.timestamp_opt(1_700_000_000 + id as i64, 0).unwrap();
+    let t = Timestamp::from_second(1_700_000_000 + id as i64).unwrap();
     PullRequest {
         repo: repo(repo_name),
         id,

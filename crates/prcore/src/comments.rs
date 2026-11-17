@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::fmt;
 
-use chrono::{DateTime, Utc};
+use jiff::Timestamp;
 use serde::{Deserialize, Serialize};
 
 use crate::diff::{Row, RowKind};
@@ -153,8 +153,8 @@ pub struct Comment {
     pub can_resolve: bool,
     pub author: UserRef,
     pub body: String,
-    pub created_on: DateTime<Utc>,
-    pub updated_on: DateTime<Utc>,
+    pub created_on: Timestamp,
+    pub updated_on: Timestamp,
     pub deleted: bool,
     pub resolved: bool,
     pub anchor: Option<Anchor>,

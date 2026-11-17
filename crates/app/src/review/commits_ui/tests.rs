@@ -1,19 +1,18 @@
 use super::*;
-use chrono::{TimeZone, Utc};
 use prcore::diff::DiffFile;
 
 fn commit(id: char, hour: u32) -> CommitInfo {
     CommitInfo {
         id: id.to_string().repeat(40),
         author: "Ada".into(),
-        date: Utc.with_ymd_and_hms(2026, 11, 16, hour, 0, 0).unwrap(),
+        date: format!("2026-11-16T{hour:02}:00:00Z").parse().unwrap(),
         subject: format!("commit {id}"),
     }
 }
 
 fn mark(hour: u32) -> ReviewMark {
     ReviewMark {
-        at: Utc.with_ymd_and_hms(2026, 11, 16, hour, 30, 0).unwrap(),
+        at: format!("2026-11-16T{hour:02}:30:00Z").parse().unwrap(),
         commit: None,
     }
 }

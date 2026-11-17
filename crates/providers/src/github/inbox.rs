@@ -2,7 +2,7 @@
 //! Entries are read field by field: one bad entry is skipped with its number and the path
 //! of the offending field, never a value.
 
-use chrono::{DateTime, Utc};
+use jiff::Timestamp;
 use prcore::comments::{looks_like_bot_name, UNKNOWN_AUTHOR};
 use prcore::model::{
     AccountId, CheckState, DiffStat, Forge, PrState, PullRequest, RepoRef, ReviewState, Reviewer,
@@ -24,8 +24,8 @@ fn str_at<'a>(v: &'a Value, path: &str) -> Option<&'a str> {
     field(v, path).and_then(Value::as_str)
 }
 
-pub(crate) fn time_at(v: &Value, path: &str) -> Option<DateTime<Utc>> {
-    field(v, path).and_then(|t| DateTime::<Utc>::deserialize(t).ok())
+pub(crate) fn time_at(v: &Value, path: &str) -> Option<Timestamp> {
+    field(v, path).and_then(|t| Timestamp::deserialize(t).ok())
 }
 
 fn u32_at(v: &Value, path: &str) -> Option<u32> {
@@ -124,7 +124,7 @@ fn is_u64(v: &Value) -> bool {
     v.as_u64().is_some()
 }
 fn is_time(v: &Value) -> bool {
-    DateTime::<Utc>::deserialize(v).is_ok()
+    Timestamp::deserialize(v).is_ok()
 }
 
 fn skipped(v: &Value, id_key: &str, field: String) -> SkippedPr {
@@ -150,8 +150,8 @@ fn base_pr(repo: &RepoRef) -> PullRequest {
         comment_count: 0,
         task_count: 0,
         reviewers: Vec::new(),
-        created_on: DateTime::<Utc>::default(),
-        updated_on: DateTime::<Utc>::default(),
+        created_on: Timestamp::default(),
+        updated_on: Timestamp::default(),
         forge: Forge::GitHub,
         account: AccountId::default(),
         web_url: String::new(),

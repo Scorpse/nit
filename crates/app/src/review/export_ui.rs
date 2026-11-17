@@ -127,7 +127,6 @@ mod tests {
     use super::*;
     use std::sync::{Arc, Mutex};
 
-    use chrono::{TimeZone, Utc};
     use prcore::comment_type::CommentType;
     use prcore::comments::{build_threads, Anchor, Comment};
     use prcore::diff::RowKind;
@@ -145,7 +144,7 @@ mod tests {
     #[test]
     fn export_reads_threads_drafts_me_and_loaded_patches() {
         let mut s = screen();
-        let t = Utc.timestamp_opt(1_700_000_000, 0).unwrap();
+        let t = jiff::Timestamp::from_second(1_700_000_000).unwrap();
         let root = Comment {
             id: 1.into(),
             parent_id: None,

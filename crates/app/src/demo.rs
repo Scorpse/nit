@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use chrono::{DateTime, TimeZone, Utc};
+use jiff::{SignedDuration, Timestamp, ToSpan};
 use prcore::model::{DiffStat, PrState, PullRequest, RepoRef, ReviewState, Reviewer, UserRef};
 
 const WS: &str = "acme";
@@ -128,9 +128,8 @@ pub const DEMO_GITLAB_USER: &str = "17";
 
 /// The demo accounts' token expiry: the GitLab token runs out in 9 days (the Accounts card
 /// shows its warning).
-pub fn demo_token_expiry(id: &prcore::model::AccountId) -> Option<chrono::NaiveDate> {
-    (id.as_str() == DEMO_GITLAB_ACCOUNT)
-        .then(|| chrono::Local::now().date_naive() + chrono::Days::new(9))
+pub fn demo_token_expiry(id: &prcore::model::AccountId) -> Option<jiff::civil::Date> {
+    (id.as_str() == DEMO_GITLAB_ACCOUNT).then(|| jiff::Zoned::now().date() + 9.days())
 }
 
 /// `demo_repo_choices` plus the second account's repositories: its own workspace and one
@@ -183,8 +182,8 @@ fn user(name: &str) -> UserRef {
     }
 }
 
-fn ts(minutes_ago: i64) -> DateTime<Utc> {
-    Utc.timestamp_opt(NOW - minutes_ago * 60, 0).unwrap()
+fn ts(minutes_ago: i64) -> Timestamp {
+    Timestamp::from_second(NOW - minutes_ago * 60).unwrap()
 }
 
 fn review(u: &UserRef, state: ReviewState) -> Reviewer {
@@ -1223,7 +1222,7 @@ export async function waitForGate(gate: Gate, ms = GATE_TIMEOUT_MS): Promise<boo
 /// My last review of the demo PR: a day ago, before the demo commit was made.
 pub fn demo_last_review() -> prcore::history::ReviewMark {
     prcore::history::ReviewMark {
-        at: chrono::Utc::now() - chrono::Duration::days(1),
+        at: Timestamp::now() - SignedDuration::from_hours(24),
         commit: None,
     }
 }

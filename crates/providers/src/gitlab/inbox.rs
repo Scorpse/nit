@@ -2,7 +2,7 @@
 //! Entries are read field by field: one bad entry is skipped with its iid and the path of
 //! the offending field, never a value.
 
-use chrono::{DateTime, Utc};
+use jiff::Timestamp;
 use prcore::comments::{looks_like_bot_name, UNKNOWN_AUTHOR};
 use prcore::model::{
     AccountId, CheckState, DiffStat, Forge, PrState, PullRequest, RepoInfo, RepoRef, ReviewState,
@@ -21,9 +21,8 @@ pub(crate) fn str_at<'a>(v: &'a Value, key: &str) -> Option<&'a str> {
     v.get(key).and_then(Value::as_str)
 }
 
-pub(crate) fn time_at(v: &Value, key: &str) -> Option<DateTime<Utc>> {
-    v.get(key)
-        .and_then(|t| DateTime::<Utc>::deserialize(t).ok())
+pub(crate) fn time_at(v: &Value, key: &str) -> Option<Timestamp> {
+    v.get(key).and_then(|t| Timestamp::deserialize(t).ok())
 }
 
 /// A GitLab user (`id`, `username`, `name`, `bot`). Missing (deleted user): unknown, empty
@@ -97,7 +96,7 @@ fn is_u64(v: &Value) -> bool {
     v.as_u64().is_some()
 }
 fn is_time(v: &Value) -> bool {
-    DateTime::<Utc>::deserialize(v).is_ok()
+    Timestamp::deserialize(v).is_ok()
 }
 
 /// The pipeline result: the head pipeline when the answer carries it, else what the merge

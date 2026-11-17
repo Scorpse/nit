@@ -127,7 +127,7 @@ impl Commits {
         match self.mark.as_ref()? {
             None => Some("You have not reviewed this yet.".into()),
             Some(m) => {
-                let when = m.at.format("%Y-%m-%d %H:%M UTC");
+                let when = m.at.strftime("%Y-%m-%d %H:%M UTC");
                 Some(match self.new_count() {
                     0 => format!("No commits since your last review ({when})."),
                     1 => format!("1 commit since your last review ({when})."),

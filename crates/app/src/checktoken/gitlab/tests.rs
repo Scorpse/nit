@@ -35,8 +35,8 @@ impl GitSide for FakeGit {
     }
 }
 
-fn today() -> NaiveDate {
-    NaiveDate::from_ymd_opt(2026, 11, 14).unwrap()
+fn today() -> Date {
+    Date::new(2026, 11, 14).unwrap()
 }
 
 fn bases(s: &MockServer, git_host: &str) -> GitLabBases {
@@ -161,7 +161,7 @@ async fn an_http_account_uses_plain_http_git_on_its_own_origin() {
 
 #[test]
 fn expiry_warning_within_14_days() {
-    let d = |y, m, day| NaiveDate::from_ymd_opt(y, m, day);
+    let d = |y, m, day| Date::new(y, m, day).ok();
     assert_eq!(expiry_warning(None, today()), None);
     assert_eq!(expiry_warning(d(2026, 12, 31), today()), None);
     assert_eq!(expiry_warning(d(2026, 11, 29), today()), None, "15 days");
