@@ -751,10 +751,10 @@ fn highlighted_follows_patch_and_is_resent_from_memory() {
     svc.request_patch(m.path.clone(), true);
     let evs = collect_until(&svc, |e| highlighted_for(e, &m.path).is_some());
     let (rows, _) = patch_for(&evs, &m.path).unwrap();
-    let pos = |f: fn(&ReviewEvent) -> bool| evs.iter().position(f).unwrap();
+    let pos = |f: &dyn Fn(&ReviewEvent) -> bool| evs.iter().position(f).unwrap();
     assert!(
-        pos(|e| matches!(e, ReviewEvent::Patch { .. }))
-            < pos(|e| matches!(e, ReviewEvent::Highlighted { .. }))
+        pos(&|e| matches!(e, ReviewEvent::Patch { path, .. } if *path == m.path))
+            < pos(&|e| matches!(e, ReviewEvent::Highlighted { path, .. } if *path == m.path))
     );
     let spans = highlighted_for(&evs, &m.path).unwrap();
     assert_eq!(spans.len(), rows.len());
