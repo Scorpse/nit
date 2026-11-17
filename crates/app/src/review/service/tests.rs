@@ -87,7 +87,15 @@ fn counted(evs: &[ReviewEvent]) -> bool {
 /// Opens and collects events until the list and its counts (or a failure) are in.
 fn open_events(svc: &ReviewService, f: &DemoReview) -> Vec<ReviewEvent> {
     svc.open(f.repo.clone(), f.pr.clone());
-    collect_until(svc, |e| (opened(e).is_some() && counted(e)) || failed(e))
+    // the trial merge is a git process of its own: wait for it, so it neither lands inside a
+    // later count of git processes nor reorders the events a test looks at
+    collect_until(svc, |e| {
+        (opened(e).is_some() && counted(e) && conflict_checked(e)) || failed(e)
+    })
+}
+
+fn conflict_checked(evs: &[ReviewEvent]) -> bool {
+    evs.iter().any(|e| matches!(e, ReviewEvent::Conflicts(_)))
 }
 
 /// The opened PR's files with their counts filled in.
