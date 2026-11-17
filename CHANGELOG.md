@@ -10,6 +10,10 @@ While the version is below 1.0, minor versions may contain breaking changes.
 
 - Every open pull request in the inbox now shows an "approved" pill once approved (nothing when not), and the detail pane has an Approval row naming who approved or asked for changes.
 - Bitbucket: people who approved or requested changes are shown even when they were never added as reviewers; before, their approval was hidden.
+- Review screen: a Commits tab lists the pull request's commits, newest first, marking those after your last review as new. Choose a commit, or "All N new, together", to see its files and diff (read only). Your last review is the exact reviewed commit on GitHub; on Bitbucket and GitLab it is the time of your last activity.
+- Inbox: a "new commits" pill on pull requests you opened in nit whose head moved since you were last caught up.
+- Inbox pills: white text on red for changes requested and conflicts, a darker readable green for approved and checks passed, and the size-limit badge in warning amber.
+
 ## [0.1.2] - 2026-11-16
 
 - Inbox rows show review and build status: changes requested, conflicts, checks failed, running or passed, open tasks and approvals. The detail pane adds Checks and Merge rows. Bitbucket reads build statuses with one extra request per open pull request; Bitbucket has no conflict flag.
