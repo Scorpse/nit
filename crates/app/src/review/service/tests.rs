@@ -87,7 +87,15 @@ fn counted(evs: &[ReviewEvent]) -> bool {
 /// Opens and collects events until the list and its counts (or a failure) are in.
 fn open_events(svc: &ReviewService, f: &DemoReview) -> Vec<ReviewEvent> {
     svc.open(f.repo.clone(), f.pr.clone());
-    collect_until(svc, |e| (opened(e).is_some() && counted(e)) || failed(e))
+    // the trial merge is a git process of its own: wait for it, so it neither lands inside a
+    // later count of git processes nor reorders the events a test looks at
+    collect_until(svc, |e| {
+        (opened(e).is_some() && counted(e) && conflict_checked(e)) || failed(e)
+    })
+}
+
+fn conflict_checked(evs: &[ReviewEvent]) -> bool {
+    evs.iter().any(|e| matches!(e, ReviewEvent::Conflicts(_)))
 }
 
 /// The opened PR's files with their counts filled in.
@@ -751,10 +759,10 @@ fn highlighted_follows_patch_and_is_resent_from_memory() {
     svc.request_patch(m.path.clone(), true);
     let evs = collect_until(&svc, |e| highlighted_for(e, &m.path).is_some());
     let (rows, _) = patch_for(&evs, &m.path).unwrap();
-    let pos = |f: fn(&ReviewEvent) -> bool| evs.iter().position(f).unwrap();
+    let pos = |f: &dyn Fn(&ReviewEvent) -> bool| evs.iter().position(f).unwrap();
     assert!(
-        pos(|e| matches!(e, ReviewEvent::Patch { .. }))
-            < pos(|e| matches!(e, ReviewEvent::Highlighted { .. }))
+        pos(&|e| matches!(e, ReviewEvent::Patch { path, .. } if *path == m.path))
+            < pos(&|e| matches!(e, ReviewEvent::Highlighted { path, .. } if *path == m.path))
     );
     let spans = highlighted_for(&evs, &m.path).unwrap();
     assert_eq!(spans.len(), rows.len());
@@ -1202,8 +1210,9 @@ fn small_pr_is_prefetched_whole_with_one_git_process() {
     let (_, files) = open_and_wait(&svc, &f);
     wait_for("whole PR", || files.iter().all(|d| svc.is_cached(&d.path)));
     std::thread::sleep(Duration::from_millis(300));
-    // refs (1), merge-base (1), file list (2), commit log (1), then every patch of the PR (1)
-    assert_eq!(git.spawn_count(), 6);
+    // refs (1), merge-base (1), file list (2), commit log (1), the trial merge (1), then every
+    // patch of the PR (1)
+    assert_eq!(git.spawn_count(), 7);
     assert_eq!(svc.patches_built(), 0);
     assert!(svc.batches_run() >= 1);
     // browsing now needs no git at all
@@ -1217,7 +1226,7 @@ fn small_pr_is_prefetched_whole_with_one_git_process() {
         .iter()
         .any(|e| matches!(e, ReviewEvent::PatchFailed { .. })));
     std::thread::sleep(Duration::from_millis(300));
-    assert_eq!(git.spawn_count(), 6);
+    assert_eq!(git.spawn_count(), 7);
 }
 
 #[test]
@@ -2165,4 +2174,24 @@ fn a_bad_range_is_an_error_not_a_crash() {
     assert!(evs
         .iter()
         .any(|e| matches!(e, ReviewEvent::RangeFiles { result: Err(_), .. })));
+}
+
+#[test]
+fn opening_a_pr_reports_that_it_merges_cleanly() {
+    let f = review_fixture();
+    let svc = local(&f);
+    let evs = {
+        svc.open(f.repo.clone(), f.pr.clone());
+        collect_until(&svc, |e| {
+            e.iter().any(|x| matches!(x, ReviewEvent::Conflicts(_)))
+        })
+    };
+    let report = evs
+        .iter()
+        .find_map(|e| match e {
+            ReviewEvent::Conflicts(r) => Some(r.clone()),
+            _ => None,
+        })
+        .expect("the trial merge answered");
+    assert!(report.expect("it ran").files.is_empty());
 }

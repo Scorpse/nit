@@ -46,6 +46,7 @@ impl ReviewScreen {
             commits: Commits::default(),
             tab: Tab::Diff,
             tasks: Tasks::default(),
+            conflicts: Conflicts::default(),
             comments_refresh: false,
             actions: ReviewActions::new(ReviewContext::default()),
             marks_key: None,
@@ -177,6 +178,8 @@ impl ReviewScreen {
                 result,
             } => self.commits.set_patch(range, path, result),
             ReviewEvent::Tasks(list) => self.tasks.set_list(list),
+            ReviewEvent::Conflicts(report) => self.conflicts.set_report(report),
+            ReviewEvent::ConflictText { path, result } => self.conflicts.set_text(path, result),
             ReviewEvent::TaskCreated(result) => self.tasks.created(result),
         }
     }

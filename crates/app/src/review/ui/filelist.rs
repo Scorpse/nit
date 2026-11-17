@@ -170,6 +170,7 @@ pub(super) fn draw_file_panel(ui: &mut Ui, s: &mut ReviewScreen) {
         area = area.vertical_scroll_offset(y);
     }
     let (selected, cursor) = (list.selected(), list.cursor());
+    let conflicted = s.conflicts.paths();
     let stats = list.dir_stats();
     let list: &FileList = list;
     let out = area.show_rows(ui, LIST_ROW_H, rows.len(), |ui, range| {
@@ -194,7 +195,8 @@ pub(super) fn draw_file_panel(ui: &mut Ui, s: &mut ReviewScreen) {
                 }
                 ListRow::File(i) => {
                     let focused = cursor == Some(Cursor::File(i));
-                    let (r, cb) = file_row(ui, list, i, selected == Some(i), focused);
+                    let conflicted = conflicted.contains(list.files()[i].path.as_str());
+                    let (r, cb) = file_row(ui, list, i, selected == Some(i), focused, conflicted);
                     if cb {
                         c.toggle = Some(i);
                     } else if r.double_clicked() {
@@ -542,6 +544,7 @@ pub(super) fn file_row(
     i: usize,
     selected: bool,
     focused: bool,
+    conflicted: bool,
 ) -> (egui::Response, bool) {
     let f = &list.files()[i];
     let tree = list.view() == ViewMode::Tree;
@@ -581,6 +584,16 @@ pub(super) fn file_row(
         paint_comment_chip(&p, right, cy, &mark);
         right -= CHIP_W;
     }
+    if conflicted {
+        p.text(
+            Pos2::new(right, cy),
+            Align2::RIGHT_CENTER,
+            "!",
+            FontId::proportional(14.0),
+            RED,
+        );
+        right -= 14.0;
+    }
 
     // left side, cut before the right side
     let depth = list.depth(ListRow::File(i));
@@ -612,6 +625,9 @@ pub(super) fn file_row(
         if mark.any() {
             tip.push('\n');
             tip.push_str(&mark.tooltip());
+        }
+        if conflicted {
+            tip.push_str("\nConflicts with the destination branch");
         }
         resp.on_hover_text(tip)
     } else {

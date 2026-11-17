@@ -5,6 +5,7 @@ use super::*;
 /// Tabs over the central pane, then the selected tab. Card clicks toggle afterwards.
 pub(super) fn draw_center(ui: &mut Ui, s: &mut ReviewScreen, acts: &mut Vec<Act>) {
     s.center_rect = Some(ui.max_rect());
+    draw_conflict_banner(ui, s);
     ui.horizontal(|ui| {
         ui.selectable_value(&mut s.tab, Tab::Diff, "Diff");
         let n = s.comments.pr_level.len();
@@ -17,6 +18,10 @@ pub(super) fn draw_center(ui: &mut Ui, s: &mut ReviewScreen, acts: &mut Vec<Act>
             };
             ui.selectable_value(&mut s.tab, Tab::Tasks, label);
         }
+        if s.conflicts.count() > 0 {
+            let label = conflicts_tab_label(s);
+            ui.selectable_value(&mut s.tab, Tab::Conflicts, label);
+        }
     });
     ui.separator();
     let mut toggles = Vec::new();
@@ -25,6 +30,7 @@ pub(super) fn draw_center(ui: &mut Ui, s: &mut ReviewScreen, acts: &mut Vec<Act>
         Tab::Conversation => draw_conversation(ui, s, &mut toggles, acts),
         Tab::Commits => draw_commits(ui, s),
         Tab::Tasks => draw_tasks(ui, s),
+        Tab::Conflicts => draw_conflicts(ui, s),
     }
     if !toggles.is_empty() {
         // the new heights are laid out on the next frame

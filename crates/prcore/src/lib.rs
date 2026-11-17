@@ -2,6 +2,7 @@ pub mod advice;
 pub mod comment_type;
 pub mod comments;
 pub mod commit;
+pub mod conflicts;
 pub mod diff;
 pub mod draft;
 pub mod export;

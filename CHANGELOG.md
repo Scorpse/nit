@@ -9,6 +9,7 @@ While the version is below 1.0, minor versions may contain breaking changes.
 ## [Unreleased]
 
 - Replaced the unmaintained `chrono` crate with `jiff` (RUSTSEC-2026-0543); dates and times look the same.
+- Review screen: a red banner and a Conflicts tab show when the pull request cannot merge into its destination branch, on every forge (Bitbucket reports no conflict flag, so nit tests the merge itself with git, which needs git 2.38 or newer). The tab lists the conflicted files and what each side did to the conflicting lines; conflicted files are marked in the file list; "Copy summary" copies the files and the commands to reproduce it. The result is as of the last fetch of the destination branch.
 
 ## [0.1.3] - 2026-11-17
 

@@ -149,6 +149,14 @@ pub enum ReviewEvent {
     LastReview(Option<ReviewMark>),
     /// My last review could not be read; the commits are still shown, none marked new.
     LastReviewFailed(String),
+    /// Whether the PR merges into its destination (as fetched): the conflicted files, none
+    /// when it merges cleanly.
+    Conflicts(Result<ConflictReport, String>),
+    /// The merged text of one conflicted file, with its conflict markers.
+    ConflictText {
+        path: String,
+        result: Result<Arc<String>, String>,
+    },
     /// The files changed in a commit range, with their line counts.
     RangeFiles {
         range: CommitRange,

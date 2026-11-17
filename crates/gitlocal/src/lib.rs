@@ -9,8 +9,8 @@ pub use discover::{
 };
 pub use pr::{
     batch_patches, batch_patches_cancellable, commit_log, fetch_pr, file_counts, file_index,
-    file_list, file_patch, file_patches, file_text, host_slug, ref_prefix, resolve_commits,
-    FetchSpec, PatchBatch, PrRefs, MAX_PATCH_BYTES, MAX_PATHSPEC_BYTES,
+    file_list, file_patch, file_patches, file_text, host_slug, merge_check, ref_prefix,
+    resolve_commits, FetchSpec, PatchBatch, PrRefs, MAX_PATCH_BYTES, MAX_PATHSPEC_BYTES,
 };
 pub use probe::{ls_remote, LS_REMOTE_TIMEOUT};
 use runner::RunOpts;

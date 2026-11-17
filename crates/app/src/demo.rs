@@ -1015,6 +1015,62 @@ pub fn review_comments() -> providers::provider::CommentList {
     }
 }
 
+/// The conflicts scene: two conflicted files, one of them with sample merged text.
+pub fn shot_conflicts(s: &mut crate::review::ui::ReviewScreen) {
+    use prcore::conflicts::{ConflictFile, ConflictKind, ConflictReport};
+    let files = [
+        ("src/m00/file_0004.rs", ConflictKind::Content),
+        ("src/m00/file_0005.rs", ConflictKind::DeletedInPr),
+        (DEMO_TREE_FILE, ConflictKind::Content),
+    ];
+    let report = ConflictReport {
+        tree: "0".repeat(40),
+        files: files
+            .iter()
+            .map(|(p, k)| ConflictFile {
+                path: (*p).into(),
+                kind: *k,
+            })
+            .collect(),
+    };
+    s.conflicts.set_report(Ok(report));
+    let body = "import { build } from \"./build\";
+
+export function catalogue(items: Item[]) {
+  const sorted = sortItems(items);
+<<<<<<< main
+  return build(sorted, { cache: true });
+=======
+  return build(sorted, { cache: false, strict: true });
+>>>>>>> feat/catalogue
+}
+
+export function empty() {
+  return [];
+}
+
+export const VERSION = 2;
+
+export function legacy() {
+  return 0;
+}
+
+export function lookup(id: string) {
+<<<<<<< main
+  return table.get(id) ?? null;
+=======
+  return table[id];
+>>>>>>> feat/catalogue
+}
+";
+    s.conflicts.selected = Some("src/m00/file_0004.rs".into());
+    s.conflicts.set_text(
+        "src/m00/file_0004.rs".into(),
+        Ok(std::sync::Arc::new(body.into())),
+    );
+    s.tab = crate::review::ui::Tab::Conflicts;
+}
+
 /// The nested file the tree screenshot selects (it carries demo threads).
 pub const DEMO_TREE_FILE: &str = "packages/engine/test/catalogue.test.ts";
 

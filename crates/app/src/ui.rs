@@ -80,6 +80,8 @@ pub enum Scene {
     ReviewCommits,
     /// The review screen on the Tasks tab (Bitbucket).
     ReviewTasks,
+    /// The review screen with merge conflicts: the banner and the Conflicts tab.
+    ReviewConflicts,
     /// The review screen with a "not in diff" entry selected (comments on a file that is
     /// not in the current diff).
     ReviewOutdated,

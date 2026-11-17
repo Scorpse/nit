@@ -27,6 +27,7 @@ pub fn ls_remote(git: &Git, url: &str, auth: &GitAuth, user: Option<&str>) -> Re
         timeout: Some(LS_REMOTE_TIMEOUT),
         cancel: None,
         progress: None,
+        ok_code: None,
     };
     // http(s) only to the account's own origin: never a credential (or an override of the
     // header slot) for another host, port or scheme
@@ -57,6 +58,7 @@ pub fn ls_remote(git: &Git, url: &str, auth: &GitAuth, user: Option<&str>) -> Re
         opts.max_bytes,
         opts.timeout,
         opts.cancel,
+        None,
         None,
     )
     .map(|_| ())
