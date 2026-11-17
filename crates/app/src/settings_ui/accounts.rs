@@ -103,7 +103,7 @@ pub struct OtherAccount {
     pub name: String,
     pub enabled: bool,
     /// When the account's token expires, where the forge says (GitLab).
-    pub expires: Option<chrono::NaiveDate>,
+    pub expires: Option<jiff::civil::Date>,
     /// Until when the account's client waits out a rate limit (set by the caller).
     pub paused_until: Option<std::time::SystemTime>,
     /// Reached over plain http (a private address): the token travels unencrypted.
@@ -124,7 +124,7 @@ pub fn other_accounts(all: &[store::Account]) -> Vec<OtherAccount> {
 /// `other_accounts` with each account's token expiry (`expiry`, from the store).
 pub fn other_accounts_with(
     all: &[store::Account],
-    expiry: impl Fn(&AccountId) -> Option<chrono::NaiveDate>,
+    expiry: impl Fn(&AccountId) -> Option<jiff::civil::Date>,
 ) -> Vec<OtherAccount> {
     all.iter()
         .filter(|a| a.id != AccountId::default_bitbucket())
@@ -160,7 +160,7 @@ pub fn removal_summary(c: &store::RemovedCounts) -> String {
 }
 
 /// The warning under an account whose token expires within 14 days (spec 5.3), or None.
-pub fn account_expiry_status(a: &OtherAccount, today: chrono::NaiveDate) -> Option<(String, Tone)> {
+pub fn account_expiry_status(a: &OtherAccount, today: jiff::civil::Date) -> Option<(String, Tone)> {
     crate::checktoken::gitlab::expiry_warning(a.expires, today).map(|w| {
         let mut w = w;
         if let Some(first) = w.get(..1) {
@@ -475,7 +475,7 @@ pub(super) fn account_card(ui: &mut egui::Ui, state: &mut SettingsState) -> Opti
                         }
                         let (text, tone) = other_account_status(&other);
                         status_line(ui, tone, &text);
-                        let today = chrono::Local::now().date_naive();
+                        let today = jiff::Zoned::now().date();
                         if let Some((warn, tone)) = account_expiry_status(&other, today) {
                             status_line(ui, tone, &warn);
                         }

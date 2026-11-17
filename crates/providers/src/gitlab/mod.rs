@@ -150,7 +150,7 @@ impl GitLabProvider {
                 .collect(),
             expires_at: v["expires_at"]
                 .as_str()
-                .and_then(|s| chrono::NaiveDate::parse_from_str(s, "%Y-%m-%d").ok()),
+                .and_then(|s| s.parse::<jiff::civil::Date>().ok()),
             active: v["active"].as_bool().unwrap_or(true),
         })
     }
@@ -255,7 +255,7 @@ impl GitLabProvider {
 
 /// `a` is later than `b` (both GitLab timestamps; unparsable ones compare as text).
 fn newer(a: &str, b: &str) -> bool {
-    let p = |s: &str| chrono::DateTime::parse_from_rfc3339(s).ok();
+    let p = |s: &str| s.parse::<jiff::Timestamp>().ok();
     match (p(a), p(b)) {
         (Some(x), Some(y)) => x > y,
         _ => a > b,
@@ -266,7 +266,7 @@ fn newer(a: &str, b: &str) -> bool {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TokenInfo {
     pub scopes: Vec<String>,
-    pub expires_at: Option<chrono::NaiveDate>,
+    pub expires_at: Option<jiff::civil::Date>,
     pub active: bool,
 }
 

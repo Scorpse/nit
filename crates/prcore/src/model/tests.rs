@@ -147,7 +147,7 @@ fn is_fork_true_when_source_repo_differs() {
         display_name: "U".into(),
         login: None,
     };
-    let now = chrono::Utc::now();
+    let now = Timestamp::now();
     let mut pr = PullRequest {
         repo: repo("acme", "api"),
         id: 1,

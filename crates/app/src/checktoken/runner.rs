@@ -111,7 +111,7 @@ pub fn main(args: CheckArgs) -> i32 {
                         bases: &bases,
                         git: &SystemGit,
                         proxy_var: proxy_var(),
-                        today: chrono::Local::now().date_naive(),
+                        today: jiff::Zoned::now().date(),
                     };
                     rt.block_on(gitlab::run(&inputs, token))
                 }

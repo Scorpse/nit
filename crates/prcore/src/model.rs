@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use jiff::Timestamp;
 use serde::{Deserialize, Serialize};
 
 pub const BB_MAX_FILES: u32 = 200;
@@ -233,8 +233,8 @@ pub struct PullRequest {
     pub comment_count: u32,
     pub task_count: u32,
     pub reviewers: Vec<Reviewer>,
-    pub created_on: DateTime<Utc>,
-    pub updated_on: DateTime<Utc>,
+    pub created_on: Timestamp,
+    pub updated_on: Timestamp,
     /// The fields below are absent from PR JSON cached before multi-forge: the serde
     /// defaults make such rows Bitbucket rows of the default account.
     #[serde(default)]

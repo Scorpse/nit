@@ -114,14 +114,14 @@ fn an_http_account_is_flagged_in_the_list() {
 
 #[test]
 fn expiry_warning_shows_on_the_account_row_within_14_days() {
-    let today = chrono::NaiveDate::from_ymd_opt(2026, 11, 14).unwrap();
+    let today = jiff::civil::Date::new(2026, 11, 14).unwrap();
     let mut a = other_accounts(&crate::demo::demo_accounts()).remove(0);
     assert_eq!(account_expiry_status(&a, today), None);
-    a.expires = chrono::NaiveDate::from_ymd_opt(2026, 11, 24);
+    a.expires = jiff::civil::Date::new(2026, 11, 24).ok();
     let (text, tone) = account_expiry_status(&a, today).unwrap();
     assert!(text.contains("expires in 10 day(s)"), "{text}");
     assert_eq!(tone, Tone::Warn);
-    a.expires = chrono::NaiveDate::from_ymd_opt(2027, 11, 24);
+    a.expires = jiff::civil::Date::new(2027, 11, 24).ok();
     assert_eq!(account_expiry_status(&a, today), None);
 }
 

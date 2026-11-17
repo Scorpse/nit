@@ -1,6 +1,5 @@
 use super::super::composer::MemoryPoster;
 use super::*;
-use chrono::TimeZone;
 use prcore::model::PrState;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
@@ -20,7 +19,7 @@ fn repo() -> RepoRef {
 }
 
 fn pr(id: u64, reviewers: Vec<(UserRef, ReviewState)>) -> PullRequest {
-    let t = chrono::Utc.timestamp_opt(1_700_000_000, 0).unwrap();
+    let t = jiff::Timestamp::from_second(1_700_000_000).unwrap();
     PullRequest {
         repo: repo(),
         id,

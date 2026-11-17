@@ -1,6 +1,5 @@
 use super::*;
 use crate::model::{RepoRef, Reviewer};
-use chrono::TimeZone;
 
 fn user(n: &str) -> UserRef {
     UserRef {
@@ -12,7 +11,7 @@ fn user(n: &str) -> UserRef {
 
 /// A Bitbucket-shaped comment: numeric id, its own id as thread, parent link.
 fn c(id: u64, parent: Option<u64>, secs: i64) -> Comment {
-    let t = Utc.timestamp_opt(1_700_000_000 + secs, 0).unwrap();
+    let t = Timestamp::from_second(1_700_000_000 + secs).unwrap();
     Comment {
         id: id.into(),
         thread: Some(id.into()),
@@ -546,7 +545,7 @@ fn context_line_allowed_on_new_side_only_uses_new_number() {
 }
 
 fn pr(id: u64, state: PrState, reviewers: Vec<ReviewState>) -> PullRequest {
-    let t = Utc.timestamp_opt(1_700_000_000, 0).unwrap();
+    let t = Timestamp::from_second(1_700_000_000).unwrap();
     let repo = RepoRef::parse_bitbucket("acme/api").unwrap();
     PullRequest {
         repo: repo.clone(),

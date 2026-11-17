@@ -1,5 +1,4 @@
 use super::*;
-use chrono::{TimeZone, Utc};
 use prcore::model::Reviewer;
 
 fn repo(n: &str) -> RepoRef {
@@ -24,7 +23,7 @@ fn other() -> UserRef {
 
 /// Open PR in `repo_name`, branch `b{id}` -> `main`, updated at `1_700_000_000 + id`.
 fn pr(repo_name: &str, id: u64) -> PullRequest {
-    let t = Utc.timestamp_opt(1_700_000_000 + id as i64, 0).unwrap();
+    let t = jiff::Timestamp::from_second(1_700_000_000 + id as i64).unwrap();
     PullRequest {
         repo: repo(repo_name),
         id,
@@ -187,7 +186,7 @@ fn github_fork_is_listed_but_never_stacked() {
 }
 
 fn at(mut p: PullRequest, secs: i64) -> PullRequest {
-    p.updated_on = Utc.timestamp_opt(secs, 0).unwrap();
+    p.updated_on = jiff::Timestamp::from_second(secs).unwrap();
     p
 }
 

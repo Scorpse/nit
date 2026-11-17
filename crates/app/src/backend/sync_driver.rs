@@ -273,7 +273,12 @@ pub(super) async fn report_requested_elsewhere(
 
 /// A local wall-clock time, `HH:MM`.
 pub fn clock(t: std::time::SystemTime) -> String {
-    chrono::DateTime::<chrono::Local>::from(t)
-        .format("%H:%M")
-        .to_string()
+    jiff::Timestamp::try_from(t).map_or_else(
+        |_| String::new(),
+        |t| {
+            t.to_zoned(jiff::tz::TimeZone::system())
+                .strftime("%H:%M")
+                .to_string()
+        },
+    )
 }

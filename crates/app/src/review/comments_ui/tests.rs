@@ -1,5 +1,4 @@
 use super::*;
-use chrono::{TimeZone, Utc};
 use prcore::comments::{Anchor, Comment};
 use prcore::diff::RowKind;
 use prcore::model::UserRef;
@@ -8,7 +7,7 @@ use std::sync::Arc;
 use crate::review::diffview::{DiffView, ROW_H};
 
 fn comment(id: u64, parent: Option<u64>, anchor: Option<Anchor>) -> Comment {
-    let t = Utc.timestamp_opt(1_700_000_000 + id as i64, 0).unwrap();
+    let t = jiff::Timestamp::from_second(1_700_000_000 + id as i64).unwrap();
     Comment {
         id: id.into(),
         parent_id: parent.map(Into::into),

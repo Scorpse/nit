@@ -1330,7 +1330,7 @@ fn back_and_reload_wait_for_a_resolve_in_flight() {
     *poster.hold_resolve.lock().unwrap() = true;
     s.composer
         .connect(poster.clone(), Arc::new(|_| Err("no rows".into())), None);
-    let t = chrono::Utc::now();
+    let t = jiff::Timestamp::now();
     let root = prcore::comments::Comment {
         id: 5.into(),
         parent_id: None,

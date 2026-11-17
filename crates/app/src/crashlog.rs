@@ -99,6 +99,13 @@ pub fn format_note(time: &str, what: &str, message: &str) -> String {
     format!("{}\n", truncate(&entry, MAX_ENTRY_BYTES - 1))
 }
 
+/// The local time as RFC 3339 with its UTC offset, to the millisecond.
+fn now_rfc3339() -> String {
+    jiff::Zoned::now()
+        .strftime("%Y-%m-%dT%H:%M:%S%.3f%:z")
+        .to_string()
+}
+
 /// Appends a `format_note` entry to the crash log (nothing when there is no data folder;
 /// I/O errors are ignored).
 pub fn record(what: &str, message: &str) {
@@ -108,7 +115,7 @@ pub fn record(what: &str, message: &str) {
     if let Some(dir) = path.parent() {
         let _ = std::fs::create_dir_all(dir);
     }
-    let entry = format_note(&chrono::Local::now().to_rfc3339(), what, message);
+    let entry = format_note(&now_rfc3339(), what, message);
     let _ = append_rotated(&path, &entry, MAX_LOG_BYTES);
 }
 
@@ -170,7 +177,7 @@ fn install_at(path: PathBuf) {
             .location()
             .map_or_else(|| "unknown location".into(), ToString::to_string);
         let entry = format_entry(
-            &chrono::Local::now().to_rfc3339(),
+            &now_rfc3339(),
             thread.name().unwrap_or("<unnamed>"),
             &location,
             &message_of(info),

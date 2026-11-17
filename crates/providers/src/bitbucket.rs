@@ -1,7 +1,7 @@
 //! Bitbucket Cloud implementation of [`Provider`].
 
 use async_trait::async_trait;
-use chrono::{DateTime, Utc};
+use jiff::Timestamp;
 use prcore::comments::{
     looks_like_bot_name, Anchor, Comment, CommentId, NewComment, PrTask, ReviewAction, TaskState,
     ThreadId, UNKNOWN_AUTHOR,
@@ -121,8 +121,8 @@ struct PrDto {
     task_count: Option<u32>,
     #[serde(default)]
     participants: Option<Vec<ParticipantDto>>,
-    created_on: DateTime<Utc>,
-    updated_on: DateTime<Utc>,
+    created_on: Timestamp,
+    updated_on: Timestamp,
 }
 
 #[derive(Deserialize)]
@@ -180,8 +180,8 @@ fn str_at<'a>(v: &'a Value, path: &str) -> Option<&'a str> {
         .filter(|s| !s.trim().is_empty())
 }
 
-fn time_at(v: &Value, path: &str) -> Option<DateTime<Utc>> {
-    field(v, path).and_then(|t| DateTime::<Utc>::deserialize(t).ok())
+fn time_at(v: &Value, path: &str) -> Option<Timestamp> {
+    field(v, path).and_then(|t| Timestamp::deserialize(t).ok())
 }
 
 /// A line number: a positive integer that fits `u32`, else `None`.
@@ -403,7 +403,7 @@ fn opt_array(v: &Value) -> bool {
     v.is_null() || v.is_array()
 }
 fn is_time(v: &Value) -> bool {
-    DateTime::<Utc>::deserialize(v).is_ok()
+    Timestamp::deserialize(v).is_ok()
 }
 
 fn field<'a>(v: &'a Value, path: &str) -> Option<&'a Value> {

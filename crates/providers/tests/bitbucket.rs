@@ -1,4 +1,3 @@
-use chrono::{TimeZone, Utc};
 use prcore::comments::{CommentId, ThreadId};
 use prcore::model::{PrState, RepoInfo, RepoRef, ReviewState, UserRef};
 use providers::bitbucket::BitbucketProvider;
@@ -183,14 +182,8 @@ async fn prs_open_maps_every_field() {
             ),
         ]
     );
-    assert_eq!(
-        pr.created_on,
-        Utc.with_ymd_and_hms(2026, 3, 1, 10, 0, 0).unwrap()
-    );
-    assert_eq!(
-        pr.updated_on,
-        Utc.with_ymd_and_hms(2026, 3, 2, 11, 30, 15).unwrap() + chrono::Duration::milliseconds(250)
-    );
+    assert_eq!(pr.created_on, ts("2026-03-01T10:00:00Z"));
+    assert_eq!(pr.updated_on, ts("2026-03-02T11:30:15.250Z"));
     // Second PR: draft, missing counts and missing destination repository.
     let draft = &prs[1];
     assert!(draft.draft);
@@ -666,7 +659,7 @@ use wiremock::matchers::body_json;
 
 const PR1: &str = "/repositories/acme/api/pullrequests/1";
 
-fn ts(s: &str) -> chrono::DateTime<Utc> {
+fn ts(s: &str) -> jiff::Timestamp {
     s.parse().unwrap()
 }
 

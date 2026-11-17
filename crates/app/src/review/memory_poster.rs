@@ -134,7 +134,7 @@ impl CommentPoster for MemoryPoster {
             None => {}
         }
         lock_ok(&self.posted).push(c.clone());
-        let now = chrono::Utc::now();
+        let now = jiff::Timestamp::now();
         let (body, parent_id, anchor) = match c {
             NewComment::Pr { text } => (text, None, None),
             NewComment::File { path, text } => (

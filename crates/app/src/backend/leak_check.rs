@@ -110,7 +110,7 @@ fn fake_session(dir: &Path) -> Vec<Secret> {
     let gh_bases = providers::github::bases_for("https://github.com").unwrap();
     let (gh, _) = add_github(&secrets, &store, &gh_bases, GH_TOKEN, &user("42", "mona")).unwrap();
     let gl_bases = providers::gitlab::bases_for("https://git.corp.example/gitlab").unwrap();
-    let expires = chrono::NaiveDate::from_ymd_opt(2027, 1, 31);
+    let expires = jiff::civil::Date::new(2027, 1, 31).ok();
     let (gl, _) = add_gitlab(
         &secrets,
         &store,

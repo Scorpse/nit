@@ -96,7 +96,7 @@ fn draw_commit_list(ui: &mut Ui, s: &mut ReviewScreen) {
             for (commit, is_new) in list.iter().zip(&new).rev() {
                 let range = commit_range(commit);
                 let on = c.selected.as_ref() == Some(&range);
-                let when = commit.date.format("%Y-%m-%d %H:%M");
+                let when = commit.date.strftime("%Y-%m-%d %H:%M");
                 let mut job = LayoutJob::default();
                 let font = FontId::proportional(13.0);
                 let fmt = |color| TextFormat {

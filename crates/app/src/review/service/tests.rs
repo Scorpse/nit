@@ -2026,7 +2026,7 @@ fn open_lists_the_commits_and_reads_my_last_review() {
     let f = review_fixture();
     let head = f.head.clone();
     let mark = prcore::history::ReviewMark {
-        at: chrono::Utc::now(),
+        at: jiff::Timestamp::now(),
         commit: Some(f.head.clone()),
     };
     let m = mark.clone();
@@ -2107,7 +2107,7 @@ fn a_commit_range_lists_its_files_and_builds_a_patch() {
     let range = crate::review::commits_ui::commit_range(&prcore::history::CommitInfo {
         id: f.head.clone(),
         author: String::new(),
-        date: chrono::Utc::now(),
+        date: jiff::Timestamp::now(),
         subject: String::new(),
     });
     svc.request_range_files(range.clone());

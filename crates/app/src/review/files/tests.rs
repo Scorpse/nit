@@ -205,12 +205,11 @@ fn only_generated_files_open_the_first_one() {
     assert_eq!(l.first_reviewable(), Some(0));
 }
 
-use chrono::{TimeZone, Utc};
 use prcore::comments::{Anchor, Comment, Thread};
 use prcore::model::UserRef;
 
 fn th(id: u64, path: Option<&str>, to: Option<u32>, resolved: bool) -> Thread {
-    let t = Utc.timestamp_opt(1_700_000_000, 0).unwrap();
+    let t = jiff::Timestamp::from_second(1_700_000_000).unwrap();
     Thread {
         root: Comment {
             id: id.into(),

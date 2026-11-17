@@ -1,6 +1,6 @@
 use super::*;
 use crate::model::{RepoRef, Reviewer, UserRef};
-use chrono::{TimeZone, Utc};
+use jiff::Timestamp;
 use Advice::*;
 
 fn repo() -> RepoRef {
@@ -16,7 +16,7 @@ fn user() -> UserRef {
 }
 
 fn pr(id: u64, state: PrState) -> PullRequest {
-    let t = Utc.timestamp_opt(1_700_000_000, 0).unwrap();
+    let t = Timestamp::from_second(1_700_000_000).unwrap();
     PullRequest {
         repo: repo(),
         id,
