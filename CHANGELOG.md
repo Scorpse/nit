@@ -8,6 +8,8 @@ While the version is below 1.0, minor versions may contain breaking changes.
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-11-17
+
 - Every open pull request in the inbox now shows an "approved" pill once approved (nothing when not), and the detail pane has an Approval row naming who approved or asked for changes.
 - Bitbucket: people who approved or requested changes are shown even when they were never added as reviewers; before, their approval was hidden.
 - Review screen: a Commits tab lists the pull request's commits, newest first, marking those after your last review as new. Choose a commit, or "All N new, together", to see its files and diff (read only). Your last review is the exact reviewed commit on GitHub; on Bitbucket and GitLab it is the time of your last activity.
@@ -64,7 +66,8 @@ First public version. Windows, Linux and macOS. Bitbucket Cloud, GitHub and GitL
 - PRs from Bitbucket forks are not supported; only open PRs can be reviewed; SSH remotes are ignored.
 - macOS and Linux builds are newer and have had less testing than Windows; the macOS disk images are not signed or notarised.
 
-[Unreleased]: https://github.com/Scorpse/nit/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/Scorpse/nit/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/Scorpse/nit/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/Scorpse/nit/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/Scorpse/nit/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/Scorpse/nit/releases/tag/v0.1.0
