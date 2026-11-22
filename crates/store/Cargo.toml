@@ -6,7 +6,7 @@ edition = "2021"
 
 [dependencies]
 prcore = { path = "../prcore" }
-rusqlite = { version = "0.42", features = ["bundled"] }
+rusqlite = { version = "0.43", features = ["bundled"] }
 serde_json = "1"
 thiserror = "2"
 
