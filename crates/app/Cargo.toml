@@ -16,7 +16,7 @@ prcore = { path = "../prcore" }
 providers = { path = "../providers" }
 store = { path = "../store" }
 sync = { path = "../sync" }
-jiff = { version = "0.2", features = ["serde"] }
+jiff = { version = "1.0", features = ["serde"] }
 eframe = { version = "0.37", default-features = false, features = ["wgpu", "default_fonts", "clipboard", "wayland", "x11"] }
 image = { version = "0.25", default-features = false, features = ["png"] }
 rfd = { version = "0.18", default-features = false }

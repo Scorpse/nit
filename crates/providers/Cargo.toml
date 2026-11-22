@@ -13,7 +13,7 @@ base64 = "0.23"
 prcore = { path = "../prcore" }
 async-trait = "0.1"
 serde = { version = "1", features = ["derive"] }
-jiff = { version = "0.2", features = ["serde"] }
+jiff = { version = "1.0", features = ["serde"] }
 futures-util = { version = "0.3", default-features = false, features = ["std"] }
 
 [dev-dependencies]
